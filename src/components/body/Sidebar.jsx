@@ -102,7 +102,7 @@ export function SidebarItem({ icon, text, active, alert, href }) {
     >
       {icon}
       <span
-        className={`overflow-hidden transition-all ${
+        className={`overflow-hidden transition-all capitalize ${
           expanded ? "w-52 ml-3" : "w-0"
         }`}
       >
