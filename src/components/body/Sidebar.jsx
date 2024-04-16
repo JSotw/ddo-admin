@@ -10,6 +10,8 @@ import { useContext, createContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+import Logo from "../../assets/img/logos/01.jpeg"
+
 const SidebarContext = createContext();
 
 export default function Sidebar({ children, nombre, correo }) {
@@ -19,11 +21,11 @@ export default function Sidebar({ children, nombre, correo }) {
   return (
     <aside className="sm:h-screen flex z-30">
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
-        <div className="p-4 pb-2 flex justify-between items-center">
+        <div className={`p-4 pb-2 flex items-center ${ expanded ? "justify-between" : "justify-center" }`}>
           <img
-            src={"Logo"}
+            src={Logo}
             className={`overflow-hidden opacity-80 transition-all drop-shadow-md shadow-black ${
-              expanded ? "w-12" : "w-0"
+              expanded ? "w-14 rounded-xl" : "w-0"
             }`}
             alt=""
           />
@@ -95,8 +97,8 @@ export function SidebarItem({ icon, text, active, alert, href }) {
         transition-colors group justify-center
         ${
           active
-            ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800"
-            : "hover:bg-indigo-50 text-gray-600"
+            ? "bg-gradient-to-tr from-amber-200 to-indigo-100 text-amber-500"
+            : "hover:bg-amber-200 text-gray-600"
         }
     `}
     >
@@ -120,7 +122,7 @@ export function SidebarItem({ icon, text, active, alert, href }) {
         <div
           className={`
           absolute left-full rounded-md px-2 py-1 ml-6
-          bg-indigo-100 text-indigo-800 text-sm
+          bg-indigo-100 text-indigo-800 text-sm capitalize
           invisible opacity-20 -translate-x-3 transition-all
           group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
       `}

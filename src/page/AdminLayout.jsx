@@ -1,6 +1,7 @@
 import Header from "../components/header/Header.jsx";
 import Sidebar, { SidebarItem } from "../components/body/Sidebar.jsx";
 import { LuBarChart3, LuDollarSign, LuUser2 } from "react-icons/lu";
+import Logo from "../assets/img/logos/01.jpeg";
 
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -22,7 +23,7 @@ const items = [
 const AdminLayout = ({ children }) => {
   const { user } = useAuth();
   return (
-    <main className="flex">
+    <main className="flex h-screen">
       <Sidebar
         nombre={user ? user.nombre : ""}
         correo={user ? user.correo : ""}
@@ -30,15 +31,21 @@ const AdminLayout = ({ children }) => {
         {items?.map((item, index) =>
           items ? (
             <div key={index}>
-              <SidebarItem icon={item.icon} text={item.name} href={`/${item.name}`} />
+              <SidebarItem
+                icon={item.icon}
+                text={item.name}
+                href={`/${item.name}`}
+              />
             </div>
           ) : (
             "No hay items disponibles"
           )
         )}
       </Sidebar>
+
       <section className="p-2 pl-10">
-        <div className="mt-5">{children}</div>
+        <Header nombre={user ? `${user.nombre} ${user.apellido_p}` : ""} />
+        <div className="pt-5">{children}</div>
       </section>
     </main>
   );
