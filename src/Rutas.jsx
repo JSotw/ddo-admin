@@ -1,16 +1,18 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
-import { PropertyProvider } from "./context/PropertyContext.jsx";
 
 /* Back Pages */
 import RutaProtegida from "./page/RutaProtegida.jsx";
 import Dashboard from "./page/Dashboard.jsx";
 import Login from "./page/Login.jsx";
 
+import ModuloUsuarios from "./page/usuarios/modulo-usuarios.jsx";
+import { UsuariosProvider } from "./context/UsuariosContext.jsx";
+
 const Rutas = () => {
   return (
     <AuthProvider>
-      <PropertyProvider>
+      <UsuariosProvider>
         <BrowserRouter>
           <Routes>
             {/* Rutas admin */}
@@ -18,15 +20,13 @@ const Rutas = () => {
               <Route path="/" element={<Login />} />
               {/* Rutas privadas */}
               <Route element={<RutaProtegida />}>
-                <Route
-                  path="/dashboard"
-                  element={<Dashboard />}
-                />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/modulo-usuarios" element={<ModuloUsuarios />} />
               </Route>
             </Route>
           </Routes>
         </BrowserRouter>
-      </PropertyProvider>
+      </UsuariosProvider>
     </AuthProvider>
   );
 };

@@ -10,28 +10,34 @@ import { useContext, createContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-import Logo from "../../assets/img/logos/01.jpeg"
+import Logo from "../../assets/img/logos/01.jpeg";
 
 const SidebarContext = createContext();
 
-export default function Sidebar({ children, nombre, correo }) {
+export default function Sidebar({ children, nombre_usuario, correo }) {
   const [expanded, setExpanded] = useState(true);
-  const {logout} = useAuth();
+  const { logout } = useAuth();
 
   return (
     <aside className="sm:h-screen flex z-30">
-      <nav className="h-full flex flex-col bg-white border-r shadow-sm">
-        <div className={`p-4 pb-2 flex items-center ${ expanded ? "justify-between" : "justify-center" }`}>
-          <img
-            src={Logo}
-            className={`overflow-hidden opacity-80 transition-all drop-shadow-md shadow-black ${
-              expanded ? "w-14 rounded-xl" : "w-0"
-            }`}
-            alt=""
-          />
+      <nav className="h-full flex flex-col bg-[#fffcf4] border-r shadow-sm">
+        <div
+          className={`p-4 pb-2 flex items-center ${
+            expanded ? "justify-between" : "justify-center"
+          }`}
+        >
+          <Link to="/dashboard">
+            <img
+              src={Logo}
+              className={`overflow-hidden opacity-80 transition-all drop-shadow-md shadow-black ${
+                expanded ? "w-14 rounded-xl" : "w-0"
+              }`}
+              alt=""
+            />
+          </Link>
           <button
             onClick={() => setExpanded((curr) => !curr)}
-            className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
+            className="p-1.5 rounded-lg bg-amber-300 hover:bg-amber-400 transition duration-300"
           >
             {expanded ? <LuChevronFirst /> : <LuChevronLast />}
           </button>
@@ -47,13 +53,13 @@ export default function Sidebar({ children, nombre, correo }) {
               <Link
                 to="/"
                 onClick={() => logout()}
-                className="w-14 h-10 shadow rounded z-0 place-items-center relative grid"
+                className="w-14 h-10 shadow bg-amber-300 rounded z-0 place-items-center relative grid"
               >
                 <LuLogOut className="rounded-md w-5 h-5" />
                 <div
                   className="absolute h-10 shadow rounded z-80 place-items-center transition-all 
-                  duration-300 p-2 hover:w-full text-center w-0 bottom-0
-                  text-[12px] bg-gray-800 text-white opacity-0 flex hover:opacity-100"
+                  duration-300 p-2 hover:w-full text-center w-0 bottom-0 font-semibold
+                  text-[12px] bg-amber-400 text-black opacity-0 flex hover:opacity-100"
                 >
                   Cerrar sesión
                 </div>
@@ -72,7 +78,7 @@ export default function Sidebar({ children, nombre, correo }) {
           `}
           >
             <div className="leading-4">
-              <h4 className="font-semibold">{nombre ? nombre : ""}</h4>
+              <h4 className="font-semibold">{nombre_usuario ? nombre_usuario : ""}</h4>
               <span className="text-xs text-gray-600">
                 {correo ? correo : ""}
               </span>
@@ -98,7 +104,7 @@ export function SidebarItem({ icon, text, active, alert, href }) {
         ${
           active
             ? "bg-gradient-to-tr from-amber-200 to-indigo-100 text-amber-500"
-            : "hover:bg-amber-200 text-gray-600"
+            : "hover:bg-amber-300 text-gray-600"
         }
     `}
     >
@@ -112,7 +118,7 @@ export function SidebarItem({ icon, text, active, alert, href }) {
       </span>
       {alert && (
         <div
-          className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
+          className={`absolute right-2 w-2 h-2 rounded bg-amber-500 ${
             expanded ? "" : "top-2"
           }`}
         />
@@ -122,7 +128,7 @@ export function SidebarItem({ icon, text, active, alert, href }) {
         <div
           className={`
           absolute left-full rounded-md px-2 py-1 ml-6
-          bg-indigo-100 text-indigo-800 text-sm capitalize
+          bg-amber-100 text-gray-700 text-sm capitalize
           invisible opacity-20 -translate-x-3 transition-all
           group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
       `}

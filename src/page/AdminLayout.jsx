@@ -6,14 +6,14 @@ import Logo from "../assets/img/logos/01.jpeg";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const items = [
-  {
-    icon: <LuBarChart3 size={20} />,
-    name: "productos",
-  },
-  {
-    icon: <LuDollarSign size={20} />,
-    name: "ventas",
-  },
+  // {
+  //   icon: <LuBarChart3 size={20} />,
+  //   name: "productos",
+  // },
+  // {
+  //   icon: <LuDollarSign size={20} />,
+  //   name: "ventas",
+  // },
   {
     icon: <LuUser2 size={20} />,
     name: "usuarios",
@@ -23,9 +23,9 @@ const items = [
 const AdminLayout = ({ children }) => {
   const { user } = useAuth();
   return (
-    <main className="flex h-screen">
+    <main className="flex">
       <Sidebar
-        nombre={user ? user.nombre : ""}
+        nombre_usuario={user ? user.nombre_usuario : ""}
         correo={user ? user.correo : ""}
       >
         {items?.map((item, index) =>
@@ -34,7 +34,7 @@ const AdminLayout = ({ children }) => {
               <SidebarItem
                 icon={item.icon}
                 text={item.name}
-                href={`/${item.name}`}
+                href={`/modulo-${item.name}`}
               />
             </div>
           ) : (
@@ -44,7 +44,7 @@ const AdminLayout = ({ children }) => {
       </Sidebar>
 
       <section className="p-2 pl-10">
-        <Header nombre={user ? `${user.nombre} ${user.apellido_p}` : ""} />
+        <Header nombre={user ? `${user.primer_n} ${user.apellido_p}` : ""} />
         <div className="pt-5">{children}</div>
       </section>
     </main>
