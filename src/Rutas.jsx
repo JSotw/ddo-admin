@@ -7,12 +7,14 @@ import Dashboard from "./page/Dashboard.jsx";
 import Login from "./page/Login.jsx";
 
 import ModuloUsuarios from "./page/usuarios/modulo-usuarios.jsx";
+import ModuloProductos from "./page/productos/modulo-productos.jsx";
 import { UsuariosProvider } from "./context/UsuariosContext.jsx";
+import { ProductosProvider } from "./context/ProductosContext.jsx";
 
 const Rutas = () => {
   return (
     <AuthProvider>
-      <UsuariosProvider>
+      <UsuariosProvider><ProductosProvider>
         <BrowserRouter>
           <Routes>
             {/* Rutas admin */}
@@ -22,11 +24,12 @@ const Rutas = () => {
               <Route element={<RutaProtegida />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/modulo-usuarios" element={<ModuloUsuarios />} />
+                <Route path="/modulo-productos" element={<ModuloProductos />} />
               </Route>
             </Route>
           </Routes>
         </BrowserRouter>
-      </UsuariosProvider>
+        </ProductosProvider></UsuariosProvider>
     </AuthProvider>
   );
 };
