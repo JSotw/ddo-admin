@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import RutaProtegida from "./page/RutaProtegida.jsx";
 import Dashboard from "./page/Dashboard.jsx";
 import Login from "./page/Login.jsx";
+import RecuperarCuenta from "./page/RecuperarCuenta.jsx";
 
 import ModuloUsuarios from "./page/usuarios/modulo-usuarios.jsx";
 import ModuloProductos from "./page/productos/modulo-productos.jsx";
@@ -20,6 +21,7 @@ const Rutas = () => {
             {/* Rutas admin */}
             <Route>
               <Route path="/" element={<Login />} />
+              <Route path="/recuperar-cuenta" element={<RecuperarCuenta />} />
               {/* Rutas privadas */}
               <Route element={<RutaProtegida />}>
                 <Route path="/dashboard" element={<Dashboard />} />

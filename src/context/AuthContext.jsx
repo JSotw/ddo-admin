@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { loginRequest, verifyTokenRequest } from "../api/apiAuth.js";
+import { loginRequest, recuperarDatos, verifyTokenRequest } from "../api/apiAuth.js";
 import Cookie  from "js-cookie";
 import Cookies from "js-cookie";
 
@@ -16,6 +16,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
+  const [sendEmail, setSendEmail] = useState(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -66,6 +67,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const datosUsuario = async (user) => {
+    try {
+      const res = await recuperarDatos(user);
+      setUser(res.data);
+      setSendEmail(true);
+    } catch (error) {
+      setErrors(error.response.data);
+    }
+  }; 
+
+
   const logout = () => {
     Cookies.remove("token");
     setIsAuth(false);
@@ -76,8 +88,10 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         signin,
+        datosUsuario,
         user,
         isAuth,
+        sendEmail,
         loading,
         errors,
         logout,
