@@ -6,10 +6,11 @@ import {
   FaUserPlus,
   FaUser,
   FaUserEdit,
-  FaTrashAlt,
   FaUserTimes,
 } from "react-icons/fa";
 import { ToastContainer, toast, Bounce } from "react-toastify";
+
+//ola
 
 const ModuloUsuarios = () => {
   const { getUsuarios, deleteUsuario, usuarios } = useUsuarios();
