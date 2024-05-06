@@ -11,27 +11,38 @@ import ModuloUsuarios from "./page/usuarios/modulo-usuarios.jsx";
 import ModuloProductos from "./page/productos/modulo-productos.jsx";
 import { UsuariosProvider } from "./context/UsuariosContext.jsx";
 import { ProductosProvider } from "./context/ProductosContext.jsx";
+import AdminLayout from "./page/AdminLayout.jsx";
 
 const Rutas = () => {
   return (
     <AuthProvider>
-      <UsuariosProvider><ProductosProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Rutas admin */}
-            <Route>
-              <Route path="/" element={<Login />} />
-              <Route path="/recuperar-cuenta" element={<RecuperarCuenta />} />
-              {/* Rutas privadas */}
-              <Route element={<RutaProtegida />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/modulo-usuarios" element={<ModuloUsuarios />} />
-                <Route path="/modulo-productos" element={<ModuloProductos />} />
+      <UsuariosProvider>
+        <ProductosProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Rutas admin */}
+              <Route>
+                <Route path="/" element={<Login />} />
+                <Route path="/recuperar-cuenta" element={<RecuperarCuenta />} />
+                {/* Rutas privadas */}
+                
+                  <Route element={<RutaProtegida />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route
+                      path="/modulo-usuarios"
+                      element={<ModuloUsuarios />}
+                    />
+                    <Route
+                      path="/modulo-productos"
+                      element={<ModuloProductos />}
+                    />
+                  </Route>
+           
               </Route>
-            </Route>
-          </Routes>
-        </BrowserRouter>
-        </ProductosProvider></UsuariosProvider>
+            </Routes>
+          </BrowserRouter>
+        </ProductosProvider>
+      </UsuariosProvider>
     </AuthProvider>
   );
 };

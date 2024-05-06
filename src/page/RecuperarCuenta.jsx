@@ -4,7 +4,6 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const RecuperarCuenta = () => {
   const {
     register,
@@ -15,9 +14,14 @@ const RecuperarCuenta = () => {
   const { datosUsuario, sendEmail, errors: datosErrors } = useAuth();
 
   useEffect(() => {
-    if (sendEmail) navigate('/')
-  }, [sendEmail])
-
+    if (sendEmail) {
+      navigate("/", {
+        state: {
+          isSendEmail : true, 
+        }
+      })
+    }
+  }, [sendEmail]);
 
   const onSubmit = handleSubmit((data) => {
     datosUsuario(data);

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { obtenerUsuarios } from "../api/apiUsuarios.js";
+import { obtenerUsuarios, eliminarUsuario } from "../api/apiUsuarios.js";
 
 const UsuariosContext = createContext();
 
@@ -36,11 +36,21 @@ export function UsuariosProvider({ children }) {
     }
   };
 
+  const deleteUsuario = async (id) => {
+    try {
+      const res = await eliminarUsuario(id);
+      if(res.status === 204) setUsuarios(usuarios.filter(usuarios => usuarios._id !== id))
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <UsuariosContext.Provider
       value={{
         usuarios,
+
         getUsuarios,
+        deleteUsuario,
       }}
     >
       {children}

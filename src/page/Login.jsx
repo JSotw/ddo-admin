@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Logo from "../assets/img/logos/01.jpeg"
+import { useNavigate, useLocation } from "react-router-dom";
+import Logo from "../assets/img/logos/01.jpeg";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import { useState } from "react";
 
 const Login = () => {
   const {
@@ -11,12 +13,31 @@ const Login = () => {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-
+  const location = useLocation();
   const { signin, isAuth, errors: signinErrors } = useAuth();
 
+  const estado = location.state;
+
   useEffect(() => {
-    if (isAuth) navigate('/dashboard')
-  }, [isAuth])
+    console.log(estado);
+    if (estado) {
+      if (estado.isSendEmail) {
+        toast.success("Datos enviados con éxito, revise su correo", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    }
+    navigate(location.pathname, { replace: true });
+    if (isAuth) navigate("/dashboard");
+  }, [isAuth]);
 
   const onSubmit = handleSubmit((data) => {
     signin(data);
@@ -24,6 +45,7 @@ const Login = () => {
 
   return (
     <section className="bg-gray-50 ">
+      <ToastContainer />
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <a
           href="#"
@@ -43,7 +65,7 @@ const Login = () => {
               className="space-y-4 md:space-y-6"
               method="POST"
             >
-               <div>
+              <div>
                 <label
                   htmlFor="nombre_usuario"
                   className="block mb-2 text-sm font-medium text-gray-900 "

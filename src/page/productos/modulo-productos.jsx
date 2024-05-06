@@ -92,7 +92,7 @@ const ModuloProductos = () => {
                   </td>
                   <td className="p-2 align-middle bg-transparent border-b w-60 h-28 whitespace-nowrap shadow-transparent">
                     {p.agregados.map((a) => (
-                      <span
+                      <span key={a.key}
                         className={`bg-gray-400 px-3.6 text-xs rounded 
                         py-2.2 inline-block whitespace-nowrap text-center align-baseline font-normal p-1
                           leading-none text-white `}
