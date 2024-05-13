@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { obtenerUsuarios, eliminarUsuario } from "../api/apiUsuarios.js";
+import { obtenerUsuarios, eliminarUsuario, crearUsuario } from "../api/apiUsuarios.js";
 
 const UsuariosContext = createContext();
 
@@ -36,6 +36,15 @@ export function UsuariosProvider({ children }) {
     }
   };
 
+  const postUsuario = async (body) => {
+    try {
+      const res = await crearUsuario(body);
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const deleteUsuario = async (id) => {
     try {
       const res = await eliminarUsuario(id);
@@ -50,6 +59,7 @@ export function UsuariosProvider({ children }) {
         usuarios,
 
         getUsuarios,
+        postUsuario,
         deleteUsuario,
       }}
     >
