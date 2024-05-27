@@ -6,7 +6,7 @@ const HomePage = () => {
     {
       id: 1,
       name: "Churrasca",
-      price: 500,
+      price: 600,
       image:
         "https://img-global.cpcdn.com/recipes/ee0bd9722324b719/1200x630cq70/photo.jpg",
       description: "Deliciosa pan cocinado al carbón",
