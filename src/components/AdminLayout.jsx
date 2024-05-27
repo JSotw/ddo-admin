@@ -1,6 +1,6 @@
 import Header from "./header/Header.jsx";
 import Sidebar, { SidebarItem } from "./body/Sidebar.jsx";
-import { LuBarChart3, LuDollarSign, LuUser2 } from "react-icons/lu";
+import { LuBarChart3, LuDollarSign, LuSandwich, LuUser2 } from "react-icons/lu";
 import { FaHamburger } from "react-icons/fa";
 import Logo from "../assets/img/logos/01.jpeg";
 
@@ -15,6 +15,10 @@ const items = [
   //   icon: <LuDollarSign size={20} />,
   //   name: "ventas",
   // },
+  {
+    icon: <LuSandwich size={20} />,
+    name: "control",
+  },
   {
     icon: <LuUser2 size={20} />,
     name: "usuarios",
