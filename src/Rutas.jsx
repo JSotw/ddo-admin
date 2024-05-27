@@ -31,7 +31,9 @@ const Rutas = () => {
 
             {/* Rutas de inicio*/}
             <Route element={<RutaProtegida />}>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/modulo-control/*" element={<PathModulos modulo={"control"} />}>
+                <Route path="lista" element={<Dashboard />} />
+              </Route>
             </Route>
           </Routes>
           {/* Rutas del modulo de usuarios */}
@@ -49,7 +51,7 @@ const Rutas = () => {
           <ProductosProvider>
             <Routes>
               <Route element={<RutaProtegida />}>
-                <Route path="/modulo-productos/*" element={<PathModulos modulo={"productos"}/>}>
+                <Route path="/modulo-productos/*" element={<PathModulos modulo={"productos"} />}>
                   {/* Rutas anidadas */}
                   <Route path="lista" element={<ListaProductos />} />
                   <Route path="crear" element={<CrearUsuario />} />

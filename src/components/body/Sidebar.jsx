@@ -26,7 +26,7 @@ export default function Sidebar({ children, nombre_usuario, correo }) {
             expanded ? "justify-between" : "justify-center"
           }`}
         >
-          <Link to="/dashboard">
+          <Link to="/modulo-control/lista">
             <img
               src={Logo}
               className={`overflow-hidden opacity-80 transition-all drop-shadow-md shadow-black ${
