@@ -124,7 +124,7 @@ const Login = () => {
                   ))}
                 </div>
                 <a
-                  href="/recuperar-cuenta"
+                  href="./recuperar-cuenta"
                   className="text-[12px] font-medium text-blue-500 hover:underline "
                 >
                   ¿Olvidó su contraseña?

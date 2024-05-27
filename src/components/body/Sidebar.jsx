@@ -19,8 +19,8 @@ export default function Sidebar({ children, nombre_usuario, correo }) {
   const { logout } = useAuth();
 
   return (
-    <aside className="sm:h-screen flex z-30">
-      <nav className="h-full flex flex-col bg-[#fffcf4] border-r shadow-sm">
+    <aside className="h-full z-10">
+      <nav className="h-screen flex flex-col bg-[#fffcf4] border-r shadow-sm">
         <div
           className={`p-4 pb-2 flex items-center ${
             expanded ? "justify-between" : "justify-center"

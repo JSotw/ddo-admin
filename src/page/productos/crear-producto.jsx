@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useUsuarios } from "../../context/UsuariosContext.jsx";
 import { useForm } from "react-hook-form";
-import AdminLayout from "../AdminLayout";
+import AdminLayout from "../../components/AdminLayout.jsx";
 
 const CrearProducto = () => {
   const {
@@ -143,7 +143,7 @@ const CrearProducto = () => {
                   <p className="text-xs">(Dejar vacío si no aplica)</p>
                 </div>
               </div>
-
+              
               <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full px-3">
                   <label
