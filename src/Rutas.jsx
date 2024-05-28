@@ -6,10 +6,11 @@ import AdminLayout from "./components/AdminLayout.jsx";
 
 // Páginas de Autentificación
 import RutaProtegida from "./components/RutaProtegida.jsx";
-import Dashboard from "./page/dashboard.jsx";
-import Login from "./page/login.jsx";
+import Dashboard from "./page/Dashboard.jsx";
+import Login from "./page/Login.jsx";
 import RecuperarCuenta from "./page/recuperar-cuenta.jsx";
 import PathModulos from "./components/PathModulos.jsx";
+import HomePage from "./home-page.jsx";
 
 // Páginas de Usuarios
 import ListaUsuarios from "./page/usuarios/lista-usuarios.jsx";
@@ -28,6 +29,7 @@ const Rutas = () => {
             {/* Rutas de autentificación */}
             <Route path="/" element={<Login />}></Route>
             <Route path="/recuperar-cuenta" element={<RecuperarCuenta />} />
+            <Route path="/home" element={<HomePage />} />
 
             {/* Rutas de inicio*/}
             <Route element={<RutaProtegida />}>
