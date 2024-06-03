@@ -1,10 +1,9 @@
-import Header from "./header/Header.jsx";
 import Sidebar, { SidebarItem } from "./body/Sidebar.jsx";
-import { LuBarChart3, LuDollarSign, LuSandwich, LuUser2 } from "react-icons/lu";
-import { FaHamburger } from "react-icons/fa";
-import Logo from "../assets/img/logos/01.jpeg";
+import { FaHamburger, FaUser, FaChartPie  } from "react-icons/fa";
+import { useMediaQuery } from "react-responsive";
 
 import { useAuth } from "../context/AuthContext.jsx";
+import NavBottom from "./body/NavBottom.jsx";
 
 const items = [
   // {
@@ -16,45 +15,56 @@ const items = [
   //   name: "ventas",
   // },
   {
-    icon: <LuSandwich size={20} />,
+    icon: <FaChartPie  size={27} />,
     name: "control",
   },
   {
-    icon: <LuUser2 size={20} />,
-    name: "usuarios",
-  },
-  {
-    icon: <FaHamburger size={20} />,
+    icon: <FaHamburger size={27} />,
     name: "productos",
   },
+  {
+    icon: <FaUser size={27} />,
+    name: "usuarios",
+  },
+  
 ];
 
 function AdminLayout({ children }) {
   const { user } = useAuth();
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+
+  console.log(isMobile);
   return (
     <main className="">
       {user ? (
-        <section className="flex h-full">
-          <Sidebar
-            nombre_usuario={user ? user.nombre_usuario : ""}
-            correo={user ? user.correo : ""}
-          >
-            {items?.map((item, index) =>
-              items ? (
-                <div key={index}>
-                  <SidebarItem
-                    icon={item.icon}
-                    text={item.name}
-                    href={`/modulo-${item.name}/lista`}
-                  />
-                </div>
-              ) : (
-                "No hay items disponibles"
-              )
-            )}
-          </Sidebar>
-          <section className="p-2 pl-10">{children}</section>
-        </section>
+        !isMobile ? (
+          <section className="flex h-full">
+            <Sidebar
+              nombre_usuario={user ? user.nombre_usuario : ""}
+              correo={user ? user.correo : ""}
+            >
+              {items?.map((item, index) =>
+                items ? (
+                  <div key={index}>
+                    <SidebarItem
+                      icon={item.icon}
+                      text={item.name}
+                      href={`/modulo-${item.name}/lista`}
+                    />
+                  </div>
+                ) : (
+                  "No hay items disponibles"
+                )
+              )}
+            </Sidebar>
+            <section className="p-2">{children}</section>
+          </section>
+        ) : (
+          <section className="grid gap-6">
+            <div className="p-4 pb-20">{children}</div>
+            <NavBottom />
+          </section>
+        )
       ) : (
         <>{children}</>
       )}

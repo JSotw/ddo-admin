@@ -1,0 +1,4 @@
+/* Quitamos el icono por defecto de los input (ver password) */
+input::-ms-reveal {
+  display: none;
+}

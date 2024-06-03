@@ -1,26 +1,29 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, redirect, useLocation, useNavigate } from "react-router-dom";
 import { useUsuarios } from "../../context/UsuariosContext.jsx";
-import { FaUserPlus, FaUser, FaUserEdit, FaUserTimes } from "react-icons/fa";
+import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
 import { toast, Bounce, ToastContainer } from "react-toastify";
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-} from "@tanstack/react-table";
+import { IoIosSend } from "react-icons/io";
+
+import DataTable, { createTheme } from "react-data-table-component";
 
 import { openAdd } from "../../components/toast/OpenType.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
+
 const ListaUsuarios = () => {
-  const [loading, setLoading] = useState(true);
-  const { getUsuarios, deleteUsuario, usuarios } = useUsuarios();
+  const { getUsuarios, deleteUsuario, loading, usuarios, records, setRecords } =
+    useUsuarios();
   const { user } = useAuth();
   const navigate = useNavigate();
+
   const location = useLocation();
   const estado = location.state;
+  const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
     getUsuarios();
+
     if (estado) {
       if (estado.toast === "success") {
         openAdd(estado.usuario);
@@ -29,34 +32,57 @@ const ListaUsuarios = () => {
       }
     }
     navigate(location.pathname, { replace: true });
+
+    // const timeout = setTimeout(() => {
+    //   setRecords(usuarios);
+    // }, 1000);
+    // return () => clearTimeout(timeout);
   }, []);
 
-  if (usuarios == [""]) {
-    setLoading(false);
-  }
-
-  const ToastDelete = ({ id, text }) => {
+  const ToastDelete = ({ selectedRecords }) => {
+    let selectedUser = [];
+    let selectedId = [];
+    for (let i = 0; i < selectedRecords.length; i++) {
+      selectedUser.push(
+        selectedRecords[i].primer_n + " " + selectedRecords[i].apellido_p
+      );
+      selectedId.push(selectedRecords[i]._id);
+    }
+    // console.log(selectedUser);
+    // console.log(selectedId);
     return (
       <div className="px-4 py-2">
-        <p>Eliminar:</p>
-        <p className="text-red-700">{text}</p>
-        <div className="mt-2 flex gap-5 ">
+        <p>Seguro de eliminar a:</p>
+        {selectedUser?.map((user, index) => (
+          <div key={index}>
+            <p className="text-red-400">{user}</p>
+          </div>
+        ))}
+        <span className="mt-2 flex gap-2">
           <button
-            onClick={() => deleteUsuario(id)}
-            className="bg-red-400 rounded-lg px-2 text-white"
+            className="bg-red-400 rounded-lg text-white text-sm px-3 py-1"
+            onClick={() => userDelete(selectedId)}
           >
             Si
           </button>
-          <button className="bg-green-400 rounded-lg px-2 text-white">
+          <button className="bg-green-400 rounded-lg text-white text-sm px-3 py-1">
             No
           </button>
-        </div>
+        </span>
       </div>
     );
   };
 
-  function openDelete(id, text) {
-    toast.warning(<ToastDelete id={id} text={text} />, {
+  function userDelete(id) {
+    //console.log(id);
+    for (let i = 0; i < id.length; i++) {
+      deleteUsuario(id[i]);
+    }
+    window.location.reload();
+  }
+
+  function openDelete(selectedRecords) {
+    toast.warning(<ToastDelete selectedRecords={selectedRecords} />, {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
@@ -69,35 +95,7 @@ const ListaUsuarios = () => {
     });
   }
 
-  const columns = [
-    {
-      header: "Usuario",
-      accessorKey: "nombre_usuario",
-    },
-    {
-      header: "Nombre",
-      accessorKey: "primer_n",
-    },
-    {
-      header: "Rol",
-      accessorKey: "rol",
-    },
-    {
-      header: "Estado",
-      accessorKey: "activo",
-    },
-    {
-      header: "Correo",
-      accessorKey: "correo",
-    },
-  ];
-
-  const reactTable = useReactTable({
-    usuarios,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-  console.log(usuarios);
+  //console.log(!usuarios);
 
   if (!usuarios) {
     return (
@@ -107,206 +105,159 @@ const ListaUsuarios = () => {
     );
   }
 
-  if (!usuarios & loading) {
+  const LoadingData = () => {
     return (
       <div className="px-4 py-1 bg-red-200 rounded-lg w-auto text-sm">
         Cargando datos...
       </div>
     );
-  }
+  };
+
+  const columns = [
+    {
+      name: "Nombre",
+      selector: (row) => `${row.primer_n} ${row.apellido_p}`,
+      sortable: true,
+    },
+    {
+      name: "Usuario",
+      selector: (row) => row.nombre_usuario,
+    },
+    {
+      name: "Rol",
+      selector: (row) => row.rol,
+      id: "rol",
+    },
+    {
+      name: "Estado",
+      selector: (row) => `${row.activo ? "Activo" : "Inactivo"}`,
+      sortable: true,
+    },
+  ];
+
+  // const elements = document.querySelectorAll(".rdt_TableCell");
+  // elements.forEach((element) => {
+  //   const innerDiv = element.querySelector('div[data-tag="allowRowEvents"]');
+  //   if (innerDiv && innerDiv.textContent.trim().toLowerCase() === "activo") {
+  //     innerDiv.classList.add("text-white", "bg-green-300", "rounded-lg", "px-2", "py-1");
+  //   }
+  // });
+
+  const searchChange = (e) => {
+    const filteredRecords = usuarios.filter((record) => {
+      return record.primer_n
+        .toLowerCase()
+        .includes(e.target.value.toLowerCase());
+    });
+    setRecords(filteredRecords);
+    //console.log(records);
+  };
+
+  const ExpandableRows = ({ data }) => {
+    let user = JSON.stringify(data);
+    let userData = JSON.parse(user);
+    return (
+      <section className=" bg-white rounded-b-lg z-4 w-full h-auto text-sm ">
+        <div className=" rounded-lg flex items-center gap-2 p-2 text-black">
+          <a
+            className="text-white bg-amber-700 shadow-md flex items-center gap-2 px-3 py-1 rounded-lg"
+            href={`mailto:${userData.correo}?subject=Contacto DDO`}
+          >
+            {userData.correo}
+            <IoIosSend />
+          </a>
+        </div>
+      </section>
+    );
+  };
+
+  const paginationOptions = {
+    rowsPerPageText: "Filas por página:",
+    rangeSeparatorText: "de",
+    noRowsPerPage: false,
+  };
+  const customCellStyles = [
+    {
+      // Aplicar estilo a la celda con la clave 'activo'
+      on: 'cell',
+      key: 'activo',
+      style: (rowData) => ({
+        color: rowData.activo ? 'red' : 'inherit', // Usar rowData.activo directamente
+      }),
+    },
+  ];
 
   if (usuarios) {
     return (
       <main>
-        <section className="flex gap-4 flex-wrap">
+        <section className="flex flex-col gap-4 w-auto">
           <ToastContainer />
-          <table className="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
-            <thead className="align-bottom">
-              <tr>
-                <th
-                  className="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b
-                  border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap 
-                  text-slate-400 opacity-70"
-                >
-                  Usuario
-                </th>
-                <th
-                  className="px-6 py-3 pl-2 font-bold text-left uppercase align-middle bg-transparent 
-                    border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap
-                  text-slate-400 opacity-70"
-                >
-                  Nombre
-                </th>
-                <th
-                  className="px-6 py-3 pl-2 font-bold text-left uppercase align-middle bg-transparent 
-                    border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap
-                  text-slate-400 opacity-70"
-                >
-                  Rol
-                </th>
-                <th
-                  className="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b
-                  border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap 
-                  text-slate-400 opacity-70"
-                >
-                  Estado
-                </th>
-                <th
-                  className="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b 
-                  border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-400 opacity-70"
-                >
-                  Correo
-                </th>
-                <th
-                  className="font-semibold capitalize align-middle text-center bg-transparent border-b
-                  border-gray-200 border-solid shadow-none tracking-none whitespace-nowrap text-[#ed9e36]"
-                >
-                  <Link className="" to="../crear">
-                    <FaUserPlus size={30} />
-                  </Link>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuarios?.map((u) =>
-                user?.rol === "SuperAdministrador" ? (
-                  <tr key={u._id}>
-                    <td className="p-2 align-middle h-20 bg-transparent border-b whitespace-nowrap shadow-transparent">
-                      <div className="flex px-2 py-1 justify-center">
-                        <div>
-                          <FaUser />{" "}
-                        </div>
-                        <div className="flex flex-col justify-center">
-                          <p className="mb-0 pl-2 font-semibold leading-tight text-xs">
-                            {`${u.nombre_usuario}`}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-2 align-middle bg-transparent border-b w-auto h-auto whitespace-nowrap shadow-transparent">
-                      <p className="mb-0 leading-tight text-xs text-slate-400 truncate text-balance text-ellipsis overflow-hidden">
-                        {`${u.primer_n} ${u.apellido_p}`}
-                      </p>
-                    </td>
-                    <td className="p-2 align-middle bg-transparent border-b w-auto h-auto whitespace-nowrap shadow-transparent">
-                      <p className="mb-0 leading-tight text-xs text-slate-400 truncate text-balance text-ellipsis overflow-hidden">
-                        {`${u.rol}`}
-                      </p>
-                    </td>
-                    <td
-                      className="p-2 leading-normal text-center align-middle bg-transparent border-b text-sm 
-                        whitespace-nowrap shadow-transparent"
-                    >
-                      <span
-                        className={`${
-                          u.activo ? `bg-green-400` : "bg-red-400"
-                        } px-3.6 text-xs rounded 
-                          py-2.2 inline-block whitespace-nowrap text-center align-baseline font-normal p-1
-                          leading-none text-white `}
-                      >
-                        {`${u.activo ? `Activo` : "Inactivo"}`}
-                      </span>
-                    </td>
-                    <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
-                      <span className="font-semibold leading-tight text-xs text-slate-400">
-                        {u.correo}
-                      </span>
-                    </td>
-                    <td
-                      className="p-2 gap-4 bg-transparent border-b
-                        flex-col h-full"
-                    >
-                      <button className="transition duration-300 hover:text-blue-400">
-                        <FaUserEdit size={14} />
-                      </button>
-                      <button
-                        onClick={() => openDelete(u._id, u.nombre_usuario)}
-                        className="transition duration-300 hover:text-red-400"
-                      >
-                        <FaUserTimes size={14} />
-                      </button>
-                    </td>
-                    {/* <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
-              <a
-                href="javascript:;"
-                className="font-semibold leading-tight text-xs text-slate-400"
+          <div className="flex m-full gap-2 px-4 justify-between items-center py-2 bg-amber-100 text-sm rounded-t-2xl">
+            <p className="font-semibold text-amber-900">Lista de Usuarios</p>
+            <div className="flex gap-2">
+              <input
+                className="appearance-none block w-full bg-amber-50 text-gray-700
+                  rounded leading-tight focus:outline-none focus:bg-white px-2"
+                placeholder="Buscar usuarios"
+                type="text"
+                id="search"
+                onChange={searchChange}
+              />
+              <Link
+                className="transition duration-300 items-center flex bg-purple-400 hover:bg-purple-500 
+              rounded-lg p-2 text-white"
+                to={`../crear`}
               >
-                {" "}
-                Ver más{" "}
-              </a>
-            </td> */}
-                  </tr>
-                ) : u.rol !== "Administrador" ? (
-                  <tr key={u._id}>
-                    <td className="p-2 align-middle h-20 bg-transparent border-b whitespace-nowrap shadow-transparent">
-                      <div className="flex px-2 py-1 justify-center">
-                        <div>
-                          <FaUser />{" "}
-                        </div>
-                        <div className="flex flex-col justify-center">
-                          <p className="mb-0 pl-2 font-semibold leading-tight text-xs">
-                            {`${u.nombre_usuario}`}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-2 align-middle bg-transparent border-b w-auto h-auto whitespace-nowrap shadow-transparent">
-                      <p className="mb-0 leading-tight text-xs text-slate-400 truncate text-balance text-ellipsis overflow-hidden">
-                        {`${u.primer_n} ${u.apellido_p}`}
-                      </p>
-                    </td>
-                    <td className="p-2 align-middle bg-transparent border-b w-auto h-auto whitespace-nowrap shadow-transparent">
-                      <p className="mb-0 leading-tight text-xs text-slate-400 truncate text-balance text-ellipsis overflow-hidden">
-                        {`${u.rol}`}
-                      </p>
-                    </td>
-                    <td
-                      className="p-2 leading-normal text-center align-middle bg-transparent border-b text-sm 
-                        whitespace-nowrap shadow-transparent"
-                    >
-                      <span
-                        className={`${
-                          u.activo ? `bg-green-400` : "bg-red-400"
-                        } px-3.6 text-xs rounded 
-                          py-2.2 inline-block whitespace-nowrap text-center align-baseline font-normal p-1
-                          leading-none text-white `}
-                      >
-                        {`${u.activo ? `Activo` : "Inactivo"}`}
-                      </span>
-                    </td>
-                    <td className="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
-                      <span className="font-semibold leading-tight text-xs text-slate-400">
-                        {u.correo}
-                      </span>
-                    </td>
-                    <td
-                      className="p-2 gap-4 bg-transparent border-b
-                        flex-col h-full"
-                    >
-                      <button className="transition duration-300 hover:text-blue-400">
-                        <FaUserEdit size={14} />
-                      </button>
-                      <button
-                        onClick={() => openDelete(u._id, u.nombre_usuario)}
-                        className="transition duration-300 hover:text-red-400"
-                      >
-                        <FaUserTimes size={14} />
-                      </button>
-                    </td>
-                    {/* <td className="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
-              <a
-                href="javascript:;"
-                className="font-semibold leading-tight text-xs text-slate-400"
-              >
-                {" "}
-                Ver más{" "}
-              </a>
-            </td> */}
-                  </tr>
-                ) : null
+                <FaPlus size={15} />
+              </Link>
+              {/* Si está seleccionado 1 usuario se podrá editar y eliminar, 
+                  si se seleccionan varios se podrá eliminar. */}
+
+              {selectedRows.selectedCount === 1 ? (
+                <>
+                  <button
+                    className="transition duration-300 bg-blue-400 hover:bg-blue-500 
+                rounded-lg p-2 text-white"
+                  >
+                    <FaPen size={15} />
+                  </button>
+                </>
+              ) : (
+                ""
               )}
-            </tbody>
-          </table>
+              {selectedRows.selectedCount > 0 ? (
+                <button
+                  className="transition duration-300 bg-red-400 hover:bg-red-500 
+                    rounded-lg p-2 text-white"
+                  onClick={() => openDelete(selectedRows.selectedRows)}
+                >
+                  <FaTrash size={15} />
+                </button>
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+          <div className="w-[700px] h-[500px] overflow-y-scroll ">
+            <DataTable
+              data={records}
+              columns={columns}
+              defaultSortFieldId={4}
+              fixedHeader={true}
+              fixedHeaderScrollHeight="600px"
+              selectableRows={true}
+              pagination={true}
+              paginationRowsPerPageOptions={[3, 6, 8]} // Opciones personalizadas
+              paginationPerPage={8}
+              paginationComponentOptions={paginationOptions}
+              onSelectedRowsChange={(row) => setSelectedRows(row)}
+              progressPending={loading}
+              progressComponent={<LoadingData />}
+              expandableRows={true}
+              expandableRowsComponent={ExpandableRows}
+              conditionalCellStyles={customCellStyles}
+            />
+          </div>
         </section>
       </main>
     );

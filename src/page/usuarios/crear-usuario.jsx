@@ -3,7 +3,7 @@ import { useUsuarios } from "../../context/UsuariosContext.jsx";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useState } from "react";
-import { RiEyeFill, RiEyeOffFill  } from "react-icons/ri";
+import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 
 const CrearUsuario = () => {
   const {
@@ -21,11 +21,10 @@ const CrearUsuario = () => {
     setShowPassword(!showPassword);
   };
 
-
-  const uploadDB = (data) => {
+  const uploadDB = async (data) => {
     try {
-      postUsuario(data);
-      navigate("/modulo-usuarios/lista", {
+      await postUsuario(data);
+      return navigate("/modulo-usuarios/lista", {
         state: { toast: "success", usuario: data.nombre_usuario },
       });
     } catch (error) {
@@ -212,13 +211,20 @@ const CrearUsuario = () => {
                     className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 
                     py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="contrasenia"
-                    pattern="^.*$" 
                     type={showPassword ? "text" : "password"}
                     {...register("contrasenia", { required: true })}
                     placeholder="1234Abc"
                   />
-                  <button className="p-1 rounded-lg  absolute right-4 transition duration-200" onClick={toggleShowPassword} type="button">
-                    {showPassword ? <RiEyeOffFill size={20}/> : <RiEyeFill size={20}/>}
+                  <button
+                    className="p-1 rounded-lg  absolute right-4 transition duration-200"
+                    onClick={toggleShowPassword}
+                    type="button"
+                  >
+                    {showPassword ? (
+                      <RiEyeOffFill size={20} />
+                    ) : (
+                      <RiEyeFill size={20} />
+                    )}
                   </button>
                 </div>
                 {errors.contrasenia && (
@@ -302,11 +308,7 @@ const CrearUsuario = () => {
           </form>
         </div>
       </section>
-      <style>
-        {
-          
-        }
-      </style>
+      <style>{}</style>
     </>
   );
 };

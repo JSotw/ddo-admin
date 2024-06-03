@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../assets/img/logos/01.jpeg";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import { useState } from "react";
+import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 
 const Login = () => {
   const {
@@ -18,8 +19,10 @@ const Login = () => {
 
   const estado = location.state;
 
+  const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
-    console.log(estado);
+    //console.log(estado);
     if (estado) {
       if (estado.isSendEmail) {
         toast.success("Datos enviados con éxito, revise su correo", {
@@ -36,12 +39,16 @@ const Login = () => {
       }
     }
     navigate(location.pathname, { replace: true });
-    if (isAuth) navigate("/dashboard");
+    if (isAuth) navigate("/modulo-control/lista");
   }, [isAuth]);
 
   const onSubmit = handleSubmit((data) => {
     signin(data);
   });
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <section className="bg-gray-50 ">
@@ -77,9 +84,9 @@ const Login = () => {
                   {...register("nombre_usuario", { required: true })}
                   name="nombre_usuario"
                   id="nombre_usuario"
-                  placeholder="Ingrese su usuario único"
+                  placeholder="Ingrese su usuario"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 text-sm"
                   required=""
                 />
                 <div className="flex items-start">
@@ -90,23 +97,36 @@ const Login = () => {
                   )}
                 </div>
               </div>
-              <div>
+              <div className="">
                 <label
                   htmlFor="contrasenia"
                   className="block mb-2 text-sm font-medium text-gray-900 "
                 >
                   Contraseña
                 </label>
-                <input
-                  type="password"
-                  {...register("contrasenia", { required: true })}
-                  name="contrasenia"
-                  id="contrasenia"
-                  placeholder="Ingrese su contraseña única"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
-                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                  required=""
-                />
+                <div className="relative flex items-center">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    {...register("contrasenia", { required: true })}
+                    name="contrasenia"
+                    id="contrasenia"
+                    placeholder="Ingrese su contraseña"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                    focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5  text-sm"
+                    required=""
+                  />
+                  <button
+                    className="p-1 rounded-lg absolute right-4 transition duration-200"
+                    onClick={toggleShowPassword}
+                    type="button"
+                  >
+                    {showPassword ? (
+                      <RiEyeOffFill size={20} />
+                    ) : (
+                      <RiEyeFill size={20} />
+                    )}
+                  </button>
+                </div>
                 <div className="flex items-start">
                   {errors.contrasenia && (
                     <p className="text-red-500 text-[12px]">
@@ -115,7 +135,7 @@ const Login = () => {
                   )}
                 </div>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between relative">
                 <div className="flex items-start">
                   {signinErrors.map((error, index) => (
                     <p className="text-[12px] text-red-500" key={index}>

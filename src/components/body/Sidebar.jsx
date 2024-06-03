@@ -19,75 +19,79 @@ export default function Sidebar({ children, nombre_usuario, correo }) {
   const { logout } = useAuth();
 
   return (
-    <aside className="h-full z-10">
-      <nav className="h-screen flex flex-col bg-[#fffcf4] border-r shadow-sm">
-        <div
-          className={`p-4 pb-2 flex items-center ${
-            expanded ? "justify-between" : "justify-center"
-          }`}
-        >
-          <Link to="/modulo-control/lista">
-            <img
-              src={Logo}
-              className={`overflow-hidden opacity-80 transition-all drop-shadow-md shadow-black ${
-                expanded ? "w-14 rounded-xl" : "w-0"
-              }`}
-              alt=""
-            />
-          </Link>
-          <button
-            onClick={() => setExpanded((curr) => !curr)}
-            className="p-1.5 rounded-lg bg-amber-300 hover:bg-amber-400 transition duration-300"
+    <>
+      <aside className="h-full z-30">
+        <nav className="h-screen flex flex-col bg-[#fffcf4] border-r shadow-sm">
+          <div
+            className={`p-4 pb-2 flex items-center ${
+              expanded ? "justify-between" : "justify-center"
+            }`}
           >
-            {expanded ? <LuChevronFirst /> : <LuChevronLast />}
-          </button>
-        </div>
+            <Link to="/modulo-control/lista">
+              <img
+                src={Logo}
+                className={`overflow-hidden opacity-80 transition-all drop-shadow-md shadow-black ${
+                  expanded ? "w-14 rounded-xl" : "w-0"
+                }`}
+                alt=""
+              />
+            </Link>
+            <button
+              onClick={() => setExpanded((curr) => !curr)}
+              className="p-1.5 rounded-lg bg-amber-300 hover:bg-amber-400 transition duration-300"
+            >
+              {expanded ? <LuChevronFirst /> : <LuChevronLast />}
+            </button>
+          </div>
 
-        <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3">{children}</ul>
-        </SidebarContext.Provider>
+          <SidebarContext.Provider value={{ expanded }}>
+            <ul className="flex-1 px-3">{children}</ul>
+          </SidebarContext.Provider>
 
-        <div className="border-t flex p-3 items-center">
-          {correo ? (
-            <div className="flex place-items-center">
-              <Link
-                to="/"
-                onClick={() => logout()}
-                className="w-14 h-10 shadow bg-amber-300 rounded z-0 place-items-center relative grid"
-              >
-                <LuLogOut className="rounded-md w-5 h-5" />
-                <div
-                  className="absolute h-10 shadow rounded z-80 place-items-center transition-all 
+          <div className="border-t flex p-3 items-center">
+            {correo ? (
+              <div className="flex place-items-center">
+                <Link
+                  to="/"
+                  onClick={() => logout()}
+                  className="w-14 h-10 shadow bg-amber-300 rounded z-0 place-items-center relative grid"
+                >
+                  <LuLogOut className="rounded-md w-5 h-5" />
+                  <div
+                    className="absolute h-10 shadow rounded z-80 place-items-center transition-all 
                   duration-300 p-2 hover:w-full text-center w-0 bottom-0 font-semibold
                   text-[12px] bg-amber-400 text-black opacity-0 flex hover:opacity-100"
-                >
-                  Cerrar sesión
-                </div>
-              </Link>
-            </div>
-          ) : (
-            <div className="w-10 h-10 shadow rounded place-items-center grid">
-              <FaHouseUser src="" alt="" className="rounded-md w-5 h-5" />
-            </div>
-          )}
+                  >
+                    Cerrar sesión
+                  </div>
+                </Link>
+              </div>
+            ) : (
+              <div className="w-10 h-10 shadow rounded place-items-center grid">
+                <FaHouseUser src="" alt="" className="rounded-md w-5 h-5" />
+              </div>
+            )}
 
-          <div
-            className={`
+            <div
+              className={`
               flex justify-between items-center
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
-          >
-            <div className="leading-4">
-              <h4 className="font-semibold">{nombre_usuario ? nombre_usuario : ""}</h4>
-              <span className="text-xs text-gray-600">
-                {correo ? correo : ""}
-              </span>
+            >
+              <div className="leading-4">
+                <h4 className="font-semibold">
+                  {nombre_usuario ? nombre_usuario : ""}
+                </h4>
+                <span className="text-xs text-gray-600">
+                  {correo ? correo : ""}
+                </span>
+              </div>
+              <LuMoreVertical size={20} />
             </div>
-            <LuMoreVertical size={20} />
           </div>
-        </div>
-      </nav>
-    </aside>
+        </nav>
+      </aside>
+    </>
   );
 }
 

@@ -1,9 +1,8 @@
-import React from 'react'
 import { IoBagHandle, IoPieChart, IoPeople, IoCart } from 'react-icons/io5'
 
 export default function DashboardStatsGrid() {
 	return (
-		<div className="flex gap-4">
+		<div className="flex flex-wrap gap-2 justify-center">
 			<BoxWrapper>
 				<div className="rounded-full h-12 w-12 flex items-center justify-center bg-sky-500">
 					<IoBagHandle className="text-2xl text-white" />
@@ -57,5 +56,5 @@ export default function DashboardStatsGrid() {
 }
 
 function BoxWrapper({ children }) {
-	return <div className="bg-white rounded-sm p-4 flex-1 border border-gray-200 flex items-center">{children}</div>
+	return <div className="bg-white rounded-xl p-4 flex-1 border border-gray-200 flex items-center">{children}</div>
 }
