@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, redirect, useLocation, useNavigate } from "react-router-dom";
 import { useUsuarios } from "../../context/UsuariosContext.jsx";
-import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
+import { FaPen, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { toast, Bounce, ToastContainer } from "react-toastify";
 import { IoIosSend } from "react-icons/io";
 
@@ -112,6 +112,13 @@ const ListaUsuarios = () => {
       </div>
     );
   };
+  const NoDataComponent = () => {
+    return (
+      <div className="px-4 py-1 bg-red-200 rounded-lg w-auto text-sm">
+        No se encuentran datos.
+      </div>
+    );
+  };
 
   const columns = [
     {
@@ -176,13 +183,14 @@ const ListaUsuarios = () => {
     rangeSeparatorText: "de",
     noRowsPerPage: false,
   };
+
   const customCellStyles = [
     {
       // Aplicar estilo a la celda con la clave 'activo'
-      on: 'cell',
-      key: 'activo',
+      on: "cell",
+      key: "activo",
       style: (rowData) => ({
-        color: rowData.activo ? 'red' : 'inherit', // Usar rowData.activo directamente
+        color: rowData.activo ? "red" : "inherit", // Usar rowData.activo directamente
       }),
     },
   ];
@@ -195,14 +203,17 @@ const ListaUsuarios = () => {
           <div className="flex m-full gap-2 px-4 justify-between items-center py-2 bg-amber-100 text-sm rounded-t-2xl">
             <p className="font-semibold text-amber-900">Lista de Usuarios</p>
             <div className="flex gap-2">
-              <input
-                className="appearance-none block w-full bg-amber-50 text-gray-700
+              <div className="flex gap-2 relative">
+                <input
+                  className="appearance-none block w-full bg-amber-50 text-gray-700
                   rounded leading-tight focus:outline-none focus:bg-white px-2"
-                placeholder="Buscar usuarios"
-                type="text"
-                id="search"
-                onChange={searchChange}
-              />
+                  placeholder="Buscar usuarios"
+                  type="text"
+                  id="search"
+                  onChange={searchChange}
+                />
+                <FaSearch className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              </div>
               <Link
                 className="transition duration-300 items-center flex bg-purple-400 hover:bg-purple-500 
               rounded-lg p-2 text-white"
@@ -238,7 +249,7 @@ const ListaUsuarios = () => {
               )}
             </div>
           </div>
-          <div className="w-[700px] h-[500px] overflow-y-scroll ">
+          <div className="w-[720px] h-[500px] overflow-y-scroll ">
             <DataTable
               data={records}
               columns={columns}
@@ -247,7 +258,7 @@ const ListaUsuarios = () => {
               fixedHeaderScrollHeight="600px"
               selectableRows={true}
               pagination={true}
-              paginationRowsPerPageOptions={[3, 6, 8]} // Opciones personalizadas
+              paginationRowsPerPageOptions={[3, 6, 8]} // Opciones de paginación personalizadas
               paginationPerPage={8}
               paginationComponentOptions={paginationOptions}
               onSelectedRowsChange={(row) => setSelectedRows(row)}
@@ -256,6 +267,21 @@ const ListaUsuarios = () => {
               expandableRows={true}
               expandableRowsComponent={ExpandableRows}
               conditionalCellStyles={customCellStyles}
+              noDataComponent={<NoDataComponent />}
+              conditionalRowStyles={[
+                {
+                  when: (rowData) => rowData.activo === true,
+                  style: {
+                    backgroundColor: "#e9ffea", // Color de fondo para filas activas
+                  },
+                },
+                {
+                  when: (rowData) => rowData.activo === false,
+                  style: {
+                    backgroundColor: "#ffc2c2", // Color de fondo para filas inactivas
+                  },
+                },
+              ]}
             />
           </div>
         </section>
