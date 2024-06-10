@@ -2,7 +2,7 @@ import Logo from "../assets/img/logos/01.jpeg";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const RecuperarCuenta = () => {
   const {
@@ -17,9 +17,9 @@ const RecuperarCuenta = () => {
     if (sendEmail) {
       navigate("/", {
         state: {
-          isSendEmail : true, 
-        }
-      })
+          isSendEmail: true,
+        },
+      });
     }
   }, [sendEmail]);
 
@@ -42,7 +42,7 @@ const RecuperarCuenta = () => {
             DDO Admin
           </a>
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 ">
-            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <div className="p-6 space-y-4 md:space-y-6 sm:p-8 relative">
               <form
                 onSubmit={onSubmit}
                 className="space-y-4 md:space-y-6"
@@ -81,7 +81,14 @@ const RecuperarCuenta = () => {
                       </p>
                     ))}
                   </div>
+                  <a
+                    href="./"
+                    className="text-[12px] font-medium text-blue-500 hover:underline "
+                  >
+                    Volver
+                  </a>
                 </div>
+
                 <button
                   type="submit"
                   className="w-full text-white bg-[#ed9e36] focus:ring-4
