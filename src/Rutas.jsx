@@ -2,12 +2,13 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { UsuariosProvider } from "./context/UsuariosContext.jsx";
 import { ProductosProvider } from "./context/ProductosContext.jsx";
+import { ReportProvider } from "./context/ReportsContext.jsx";
 import AdminLayout from "./components/AdminLayout.jsx";
 
 // Páginas de Autentificación
 import RutaProtegida from "./components/RutaProtegida.jsx";
-import Dashboard from "./page/dashboard.jsx";
-import Login from "./page/login.jsx";
+import Dashboard from "./page/Dashboard.jsx";
+import Login from "./page/Login.jsx";
 import RecuperarCuenta from "./page/recuperar-cuenta.jsx";
 import PathModulos from "./components/PathModulos.jsx";
 
@@ -17,6 +18,7 @@ import CrearUsuario from "./page/usuarios/crear-usuario.jsx";
 
 // Páginas de Productos
 import ListaProductos from "./page/productos/lista-productos.jsx";
+import CrearProducto from "./page/productos/crear-producto.jsx";
 
 // 
 import "./App.css";
@@ -33,15 +35,18 @@ const Rutas = () => {
             <Route path="/recuperar-cuenta" element={<RecuperarCuenta />} />
 
             {/* Rutas de inicio*/}
-            <Route element={<RutaProtegida />}>
-              <Route
-                path="/modulo-control/*"
-                element={<PathModulos modulo={"control"} />}
-              >
-                <Route path="lista" element={<Dashboard />} />
-              </Route>
-            </Route>
           </Routes>
+          <ReportProvider>
+            <Routes>
+              <Route element={<RutaProtegida />}>
+                <Route
+                  path="/modulo-control/*"
+                  element={<PathModulos modulo={"control"} />}>
+                  <Route path="lista" element={<Dashboard />} />
+                </Route>
+              </Route>
+            </Routes>
+          </ReportProvider>
           {/* Rutas del modulo de usuarios */}
           <UsuariosProvider>
             <Routes>
@@ -66,7 +71,7 @@ const Rutas = () => {
                 >
                   {/* Rutas anidadas */}
                   <Route path="lista" element={<ListaProductos />} />
-                  <Route path="crear" element={<CrearUsuario />} />
+                  <Route path="crear" element={<CrearProducto />} />
                 </Route>
               </Route>
             </Routes>

@@ -12,7 +12,7 @@ const CrearUsuario = () => {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { postUsuario, getUsuario } = useUsuarios();
+  const { postUsuario } = useUsuarios();
   const { user } = useAuth();
   const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const [showPassword, setShowPassword] = useState(false);

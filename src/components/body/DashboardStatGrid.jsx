@@ -1,6 +1,16 @@
-import { IoBagHandle, IoPieChart, IoPeople, IoCart } from 'react-icons/io5'
+import { IoBagHandle, IoPieChart, IoPeople, IoCart } from 'react-icons/io5';
+import { useEffect, useState } from "react";
+import { useReport } from "../../context/ReportsContext.jsx";
+
 
 export default function DashboardStatsGrid() {
+	
+	const { dataReporteDiario, loading, getReporteDiario } =
+    useReport();
+	useEffect(() => {
+		getReporteDiario();
+	  }, []);
+
 	return (
 		<div className="flex flex-wrap gap-2 justify-center">
 			<BoxWrapper>
@@ -10,8 +20,13 @@ export default function DashboardStatsGrid() {
 				<div className="pl-4">
 					<span className="text-sm text-gray-500 font-light">Ventas totales</span>
 					<div className="flex items-center">
-						<strong className="text-xl text-gray-700 font-semibold">$54232</strong>
-						<span className="text-sm text-green-500 pl-2">+343</span>
+						<strong className="text-xl text-gray-700 font-semibold">{dataReporteDiario.total}</strong>
+						{dataReporteDiario.totalAnterior > dataReporteDiario.total ? 
+						(<span className="text-sm text-red-500 pl-2">-{dataReporteDiario.totalAnterior - dataReporteDiario.total}</span>)
+						: dataReporteDiario.totalAnterior == dataReporteDiario.total ?
+						(<span className="text-sm text-gray-500 pl-2">--</span>)
+						:(<span className="text-sm text-green-500 pl-2">+{dataReporteDiario.total - dataReporteDiario.totalAnterior}</span>)}
+						
 					</div>
 				</div>
 			</BoxWrapper>
@@ -22,8 +37,12 @@ export default function DashboardStatsGrid() {
 				<div className="pl-4">
 					<span className="text-sm text-gray-500 font-light">Gastos totales</span>
 					<div className="flex items-center">
-						<strong className="text-xl text-gray-700 font-semibold">$3423</strong>
-						<span className="text-sm text-green-500 pl-2">-343</span>
+						<strong className="text-xl text-gray-700 font-semibold">{dataReporteDiario.gastos}</strong>
+						{dataReporteDiario.gastosAnteriores > dataReporteDiario.gastos ? 
+						(<span className="text-sm text-red-500 pl-2">-{dataReporteDiario.gastosAnteriores - dataReporteDiario.gastos}</span>)
+						: dataReporteDiario.gastosAnteriores == dataReporteDiario.gastos ?
+						(<span className="text-sm text-gray-500 pl-2">--</span>)
+						:(<span className="text-sm text-green-500 pl-2">+{dataReporteDiario.gastos - dataReporteDiario.gastosAnteriores}</span>)}
 					</div>
 				</div>
 			</BoxWrapper>
@@ -34,8 +53,12 @@ export default function DashboardStatsGrid() {
 				<div className="pl-4">
 					<span className="text-sm text-gray-500 font-light">Clientes totales</span>
 					<div className="flex items-center">
-						<strong className="text-xl text-gray-700 font-semibold">12313</strong>
-						<span className="text-sm text-red-500 pl-2">-30</span>
+						<strong className="text-xl text-gray-700 font-semibold">{dataReporteDiario.clientes}</strong>
+						{dataReporteDiario.clientesAnteriores > dataReporteDiario.clientes ? 
+						(<span className="text-sm text-red-500 pl-2">-{dataReporteDiario.clientesAnteriores - dataReporteDiario.clientes}</span>)
+						: dataReporteDiario.clientesAnteriores == dataReporteDiario.clientes ?
+						(<span className="text-sm text-gray-500 pl-2">--</span>)
+						:(<span className="text-sm text-green-500 pl-2">+{dataReporteDiario.clientes - dataReporteDiario.clientesAnteriores}</span>)}
 					</div>
 				</div>
 			</BoxWrapper>
@@ -46,8 +69,12 @@ export default function DashboardStatsGrid() {
 				<div className="pl-4">
 					<span className="text-sm text-gray-500 font-light">Ordenes totales</span>
 					<div className="flex items-center">
-						<strong className="text-xl text-gray-700 font-semibold">16432</strong>
-						<span className="text-sm text-red-500 pl-2">-43</span>
+						<strong className="text-xl text-gray-700 font-semibold">{dataReporteDiario.ordenes}</strong>
+						{dataReporteDiario.ordenesAnteriores > dataReporteDiario.ordenes ? 
+						(<span className="text-sm text-red-500 pl-2">-{dataReporteDiario.ordenesAnteriores - dataReporteDiario.ordenes}</span>)
+						: dataReporteDiario.ordenesAnteriores == dataReporteDiario.ordenes ?
+						(<span className="text-sm text-gray-500 pl-2">--</span>)
+						:(<span className="text-sm text-green-500 pl-2">+{dataReporteDiario.ordenes - dataReporteDiario.ordenesAnteriores}</span>)}
 					</div>
 				</div>
 			</BoxWrapper>
