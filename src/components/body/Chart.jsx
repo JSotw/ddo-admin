@@ -10,6 +10,8 @@ import {
   ResponsiveContainer,
   Rectangle,
 } from "recharts";
+import { useReport } from "../../context/ReportsContext.jsx";
+import { useEffect, useState } from "react";
 
 const data = [
   {
@@ -57,6 +59,12 @@ const data = [
 ];
 
 export default function Chart() {
+	const { dataReportePorDia, loading, getReportePorDia } = useReport();
+	useEffect(() => {
+		getReportePorDia();
+		console.log(dataReportePorDia);
+  }, []);
+
   return (
     <div className="h-[22rem] bg-white p-4 rounded-xl border border-gray-200 flex flex-col flex-1">
       <strong className="text-gray-700 font-medium text-center">Transacciones</strong>
@@ -65,7 +73,7 @@ export default function Chart() {
           <BarChart
             width={500}
             height={300}
-            data={data}
+            data={dataReportePorDia}
             margin={{
               top: 5,
               right: 30,
@@ -74,19 +82,14 @@ export default function Chart() {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
+            <XAxis dataKey="fecha" />
             <YAxis />
             <Tooltip />
             <Legend />
             <Bar
-              dataKey="pv"
+              dataKey="monto"
               fill="#8884d8"
               activeBar={<Rectangle fill="pink" stroke="blue" />}
-            />
-            <Bar
-              dataKey="uv"
-              fill="#82ca9d"
-              activeBar={<Rectangle fill="gold" stroke="purple" />}
             />
           </BarChart>
         </ResponsiveContainer>
