@@ -255,7 +255,7 @@ const ListaUsuarios = () => {
               columns={columns}
               defaultSortFieldId={4}
               fixedHeader={true}
-              fixedHeaderScrollHeight="600px"
+              fixedHeaderScrollHeight="700px"
               selectableRows={true}
               pagination={true}
               paginationRowsPerPageOptions={[3, 6, 8]} // Opciones de paginación personalizadas
