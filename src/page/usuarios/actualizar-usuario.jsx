@@ -1,39 +1,57 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUsuarios } from "../../context/UsuariosContext.jsx";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 
-const CrearUsuario = () => {
+const ActualizarUsuario = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { postUsuario } = useUsuarios();
+  const { getUsuario, putUsuario } = useUsuarios();
   const { user } = useAuth();
   const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const [showPassword, setShowPassword] = useState(false);
+  const params = useParams();
+  useEffect(() => {
+    async function loadUsuario() {
+      if (params.id) {
+        //console.log(params.id);
+        const usuario = await getUsuario(params.id);
+        //console.log(usuario);
+        setValue("primer_n", usuario.primer_n);
+        setValue("segundo_n", usuario.segundo_n);
+        setValue("apellido_p", usuario.apellido_p);
+        setValue("apellido_m", usuario.apellido_m);
+        setValue("correo", usuario.correo);
+        setValue("nombre_usuario", usuario.nombre_usuario);
+        setValue("contrasenia", usuario.contrasenia);
+        setValue("imagen_perfil", usuario.imagen_perfil);
+        setValue("rol", usuario.rol);
+        setValue("activo", usuario.activo);
+      }
+    }
+    loadUsuario();
+  }, []);
+
+  //console.log(locationId);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const uploadDB = async (data) => {
+  const uploadDB = async (id, data) => {
     try {
-      const res = await postUsuario(data);
-      if (res) {
-        return navigate("/modulo-usuarios/lista", {
-          state: { toast: "success", usuario: data.nombre_usuario },
-        });
-      } else {
-        return navigate("/modulo-usuarios/lista", {
-          state: { toast: "error", usuario: data.nombre_usuario },
-        });
-      }
-      
+      const res = await putUsuario(id, data);
+      console.log(res);
+      return navigate("/modulo-usuarios/lista", {
+        state: { toast: "success", usuario: data.nombre_usuario },
+      });
     } catch (error) {
       console.error(error);
     }
@@ -50,6 +68,7 @@ const CrearUsuario = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     let dataCorreo = document.getElementById("correo").value;
+    //console.log(dataCorreo);
     let errorCorreo = document.getElementById("error__correo");
 
     if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
@@ -63,9 +82,9 @@ const CrearUsuario = () => {
         contrasenia: data.contrasenia,
         imagen_perfil: "",
         rol: data.rol,
-        activo: true,
+        activo: data.activo,
       };
-      uploadDB(usuarioData);
+      uploadDB(params.id, usuarioData);
     } else {
       errorCorreo.textContent = "Correo ingresado incorrecto";
     }
@@ -78,7 +97,7 @@ const CrearUsuario = () => {
           <form
             className="w-full max-w-lg text-sm"
             onSubmit={onSubmit}
-            method="post"
+            method="put"
           >
             <div className="flex flex-wrap -mx-3 mb-4">
               <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -163,9 +182,8 @@ const CrearUsuario = () => {
                 )}
               </div>
             </div>
-
-            <div className="flex flex-wrap -mx-3 mb-6">
-              <div className="w-full px-3">
+            <div className="flex flex-wrap -mx-3 mb-2">
+              <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
                 <label
                   className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                   htmlFor="correo"
@@ -185,6 +203,37 @@ const CrearUsuario = () => {
                 <p className="text-red-500 text-xs" id="error__correo">
                   {errors.correo && "Se requiere un correo válido"}
                 </p>
+              </div>
+              <div className="w-full md:w-1/2 px-3 mb-6 md:mb-3">
+                <label
+                  className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                  htmlFor="rol"
+                >
+                  Estado (*)
+                </label>
+                <div className="relative cursor-pointer">
+                  <select
+                    className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 
+                    py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    id="activo"
+                    {...register("activo", { required: true })}
+                  >
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg
+                      className="fill-current h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
+                {errors.activo && (
+                  <p className="text-red-500 text-xs">Se requiere un estado</p>
+                )}
               </div>
             </div>
             <div className="flex flex-wrap -mx-3 mb-2">
@@ -253,7 +302,7 @@ const CrearUsuario = () => {
                   <select
                     className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 
                     py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    id="category"
+                    id="rol"
                     {...register("rol", { required: true })}
                   >
                     {user?.rol === "SuperAdministrador" ? (
@@ -310,7 +359,7 @@ const CrearUsuario = () => {
               className=" bg-purple-300 hover:bg-purple-400 text-gray-800 font-semibold text-sm py-2 
               px-4 rounded inline-flex items-center justify-center gap-2 transition-all w-full"
             >
-              <span>Agregar</span>
+              <span>Actualizar</span>
             </button>
           </form>
         </div>
@@ -319,4 +368,4 @@ const CrearUsuario = () => {
     </>
   );
 };
-export default CrearUsuario;
+export default ActualizarUsuario;

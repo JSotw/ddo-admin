@@ -4,23 +4,30 @@ import {
   LuChevronFirst,
   LuLogOut,
 } from "react-icons/lu";
-import { FaHouseUser } from "react-icons/fa";
+import { FaHouseUser, FaUser } from "react-icons/fa";
 
 import { useContext, createContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 import Logo from "../../assets/img/logos/01.jpeg";
+import PerfilMenu from "./perfil/PerfilMenu.jsx";
 
 const SidebarContext = createContext();
 
-export default function Sidebar({ children, nombre_usuario, correo }) {
+export default function Sidebar({
+  children,
+  nombre_usuario,
+  nombre_completo,
+  imagen_perfil,
+}) {
   const [expanded, setExpanded] = useState(true);
   const { logout } = useAuth();
+  const [showPerfil, setShowPerfil] = useState(false);
 
   return (
     <>
-      <aside className="h-full z-30">
+      <aside className="h-full z-30 relative">
         <nav className="h-screen flex flex-col bg-[#fffcf4] border-r shadow-sm">
           <div
             className={`p-4 pb-2 flex items-center ${
@@ -33,7 +40,7 @@ export default function Sidebar({ children, nombre_usuario, correo }) {
                 className={`overflow-hidden opacity-80 transition-all drop-shadow-md shadow-black ${
                   expanded ? "w-14 rounded-xl" : "w-0"
                 }`}
-                alt=""
+                alt={`${Logo}`}
               />
             </Link>
             <button
@@ -48,23 +55,16 @@ export default function Sidebar({ children, nombre_usuario, correo }) {
             <ul className="flex-1 px-3">{children}</ul>
           </SidebarContext.Provider>
 
-          <div className="border-t flex p-3 items-center">
-            {correo ? (
-              <div className="flex place-items-center">
-                <Link
-                  to="/"
-                  onClick={() => logout()}
-                  className="w-14 h-10 shadow bg-amber-300 rounded z-0 place-items-center relative grid"
+          <div className="border-t flex p-2 justify-center items-center">
+            {nombre_completo ? (
+              <div className="flex place-items-center justify-center">
+                <button
+                  className="p-1.5 rounded-lg bg-amber-300 hover:bg-amber-400 transition duration-300"
+                  onClick={() => setShowPerfil(!showPerfil)}
                 >
-                  <LuLogOut className="rounded-md w-5 h-5" />
-                  <div
-                    className="absolute h-10 shadow rounded z-80 place-items-center transition-all 
-                  duration-300 p-2 hover:w-full text-center w-0 bottom-0 font-semibold
-                  text-[12px] bg-amber-400 text-black opacity-0 flex hover:opacity-100"
-                  >
-                    Cerrar sesión
-                  </div>
-                </Link>
+                  <LuMoreVertical  size={20} />
+                </button>
+                {showPerfil && <PerfilMenu />}
               </div>
             ) : (
               <div className="w-10 h-10 shadow rounded place-items-center grid">
@@ -83,10 +83,20 @@ export default function Sidebar({ children, nombre_usuario, correo }) {
                   {nombre_usuario ? nombre_usuario : ""}
                 </h4>
                 <span className="text-xs text-gray-600">
-                  {correo ? correo : ""}
+                  {nombre_completo ? nombre_completo : ""}
                 </span>
               </div>
-              <LuMoreVertical size={20} />
+              {imagen_perfil ? (
+                <img
+                  src={imagen_perfil}
+                  className="w-10 p-2 h-10 rounded-xl shadow-md"
+                  alt=""
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center">
+                  <FaUser size={20} />
+                </div>
+              )}
             </div>
           </div>
         </nav>

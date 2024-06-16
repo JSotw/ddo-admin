@@ -41,7 +41,8 @@ function AdminLayout({ children }) {
           <section className="flex h-full">
             <Sidebar
               nombre_usuario={user ? user.nombre_usuario : ""}
-              correo={user ? user.correo : ""}
+              nombre_completo={user ? `${user.primer_n} ${user.apellido_p}` : ""}
+              imagen_perfil={user ? user.imagen_perfil : ""}
             >
               {items?.map((item, index) =>
                 items ? (

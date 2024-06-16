@@ -1,7 +1,10 @@
 import { createContext, useContext, useState, useEffect } from "react";
+// Importamos las funciones de axios (get, post, put, delete)
 import {
   obtenerUsuarios,
   eliminarUsuario,
+  obtenerUsuario,
+  actualizarUsuario,
   crearUsuario,
 } from "../api/apiUsuarios.js";
 
@@ -18,8 +21,9 @@ export const useUsuarios = () => {
 };
 
 export function UsuariosProvider({ children }) {
-  const [usuarios, setUsuarios] = useState([]);
-  const [records, setRecords] = useState([]);
+  const [usuarios, setUsuarios] = useState([]); // Obtenemos todos los usuarios de la base de datos
+  const [usuario, setUsuario] = useState([]); // Obtenemos el usuario
+  const [records, setRecords] = useState([]); // Obtenemos todos los registros para buscar en la tabla
   const [loading, setLoading] = useState(true);
 
   const [errors, setErrors] = useState([]);
@@ -54,6 +58,23 @@ export function UsuariosProvider({ children }) {
     }
   };
 
+  const getUsuario = async (id) => {
+    try {
+      const res = await obtenerUsuario(id);
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const putUsuario = async (id, data) => {
+    try {
+      const res = await actualizarUsuario(id, data);
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const deleteUsuario = async (id) => {
     try {
       const res = await eliminarUsuario(id);
@@ -63,14 +84,20 @@ export function UsuariosProvider({ children }) {
       console.error(error);
     }
   };
+
   return (
     <UsuariosContext.Provider
       value={{
+        // Datos
         usuarios,
+        usuario,
         records,
-        setRecords,
         loading,
 
+        // Funciones
+        setRecords,
+        getUsuario,
+        putUsuario,
         getUsuarios,
         postUsuario,
         deleteUsuario,

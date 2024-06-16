@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useState } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 
-const CrearUsuario = () => {
+const CrearPedido = () => {
   const {
     register,
     handleSubmit,
@@ -23,17 +23,10 @@ const CrearUsuario = () => {
 
   const uploadDB = async (data) => {
     try {
-      const res = await postUsuario(data);
-      if (res) {
-        return navigate("/modulo-usuarios/lista", {
-          state: { toast: "success", usuario: data.nombre_usuario },
-        });
-      } else {
-        return navigate("/modulo-usuarios/lista", {
-          state: { toast: "error", usuario: data.nombre_usuario },
-        });
-      }
-      
+      await postUsuario(data);
+      return navigate("/modulo-usuarios/lista", {
+        state: { toast: "success", usuario: data.nombre_usuario },
+      });
     } catch (error) {
       console.error(error);
     }
@@ -49,7 +42,7 @@ const CrearUsuario = () => {
   };
 
   const onSubmit = handleSubmit(async (data) => {
-    let dataCorreo = document.getElementById("correo").value;
+    let dataCorreo = data.correo;
     let errorCorreo = document.getElementById("error__correo");
 
     if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
@@ -319,4 +312,4 @@ const CrearUsuario = () => {
     </>
   );
 };
-export default CrearUsuario;
+export default CrearPedido;

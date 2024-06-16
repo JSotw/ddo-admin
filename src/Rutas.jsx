@@ -7,10 +7,12 @@ import AdminLayout from "./components/AdminLayout.jsx";
 
 // Páginas de Autentificación
 import RutaProtegida from "./components/RutaProtegida.jsx";
-import Dashboard from "./page/Dashboard.jsx";
-import Login from "./page/Login.jsx";
+import Dashboard from "./page/dashboard.jsx";
+import Login from "./page/login.jsx";
 import RecuperarCuenta from "./page/recuperar-cuenta.jsx";
 import PathModulos from "./components/PathModulos.jsx";
+// Páginas de perfil
+import Perfil from "./page/perfil/perfil.jsx";
 
 // Páginas de Usuarios
 import ListaUsuarios from "./page/usuarios/lista-usuarios.jsx";
@@ -22,6 +24,7 @@ import CrearProducto from "./page/productos/crear-producto.jsx";
 
 // 
 import "./App.css";
+import ActualizarUsuario from "./page/usuarios/actualizar-usuario.jsx";
 
 const Rutas = () => {
   return (
@@ -30,12 +33,13 @@ const Rutas = () => {
         <AdminLayout>
           {/* -> Navegación */}
           <Routes>
-            {/* Rutas de autentificación */}
+            {/* Rutas de generales */}
             <Route path="/" element={<Login />}></Route>
             <Route path="/recuperar-cuenta" element={<RecuperarCuenta />} />
-
-            {/* Rutas de inicio*/}
+            <Route path="/perfil" element={<Perfil />} />
           </Routes>
+
+          {/* Rutas de control*/}
           <ReportProvider>
             <Routes>
               <Route element={<RutaProtegida />}>
@@ -57,6 +61,7 @@ const Rutas = () => {
                 >
                   <Route path="lista" element={<ListaUsuarios />} />
                   <Route path="crear" element={<CrearUsuario />} />
+                  <Route path="actualizar/:id" element={<ActualizarUsuario />} />
                 </Route>
               </Route>
             </Routes>

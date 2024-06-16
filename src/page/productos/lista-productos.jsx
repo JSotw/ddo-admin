@@ -8,7 +8,7 @@ import { IoIosSend } from "react-icons/io";
 
 import DataTable, { createTheme } from "react-data-table-component";
 
-import { openAdd } from "../../components/toast/OpenType.jsx";
+import { openSuccess } from "../../components/toast/OpenType.jsx";
 
 const ListaProductos = () => {
   const { getProductos, loading, productos, setRecords, records, deleteProducto } =
@@ -24,8 +24,8 @@ const ListaProductos = () => {
 
     if (estado) {
       if (estado.toast === "success") {
-        openAdd(estado.producto);
-      } else if (estado.toast === "warning") {
+        openSuccess("producto", estado.producto);
+      } else if (estado.toast === "error") {
         console.log(estado.toast);
       }
     }

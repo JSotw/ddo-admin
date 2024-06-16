@@ -1,19 +1,16 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useUsuarios } from "../../context/UsuariosContext.jsx";
 import { FaPen, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { toast, Bounce, ToastContainer } from "react-toastify";
 import { IoIosSend } from "react-icons/io";
 
 import DataTable, { createTheme } from "react-data-table-component";
 
-import { openSuccess, openError } from "../../components/toast/OpenType.jsx";
+import { openAdd } from "../../components/toast/OpenType.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 
-const ListaUsuarios = () => {
-  const { getUsuarios, deleteUsuario, loading, usuarios, records, setRecords } =
-    useUsuarios();
+const ListaPedidos = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -26,9 +23,9 @@ const ListaUsuarios = () => {
 
     if (estado) {
       if (estado.toast === "success") {
-        openSuccess("usuario", estado.usuario);
-      } else if (estado.toast === "error") {
-        openError("usuario", estado.usuario);
+        openAdd(estado.usuario);
+      } else if (estado.toast === "warning") {
+        console.log(estado.toast);
       }
     }
     navigate(location.pathname, { replace: true });
@@ -142,13 +139,7 @@ const ListaUsuarios = () => {
     },
   ];
 
-  // const elements = document.querySelectorAll(".rdt_TableCell");
-  // elements.forEach((element) => {
-  //   const innerDiv = element.querySelector('div[data-tag="allowRowEvents"]');
-  //   if (innerDiv && innerDiv.textContent.trim().toLowerCase() === "activo") {
-  //     innerDiv.classList.add("text-white", "bg-green-300", "rounded-lg", "px-2", "py-1");
-  //   }
-  // });
+  
 
   const searchChange = (e) => {
     const filteredRecords = usuarios.filter((record) => {
@@ -226,13 +217,12 @@ const ListaUsuarios = () => {
 
               {selectedRows.selectedCount === 1 ? (
                 <>
-                  <Link
-                    to={`../actualizar/${selectedRows.selectedRows[0]._id}`}
+                  <button
                     className="transition duration-300 bg-blue-400 hover:bg-blue-500 
                 rounded-lg p-2 text-white"
                   >
                     <FaPen size={15} />
-                  </Link>
+                  </button>
                 </>
               ) : (
                 ""
@@ -291,4 +281,4 @@ const ListaUsuarios = () => {
   }
 };
 
-export default ListaUsuarios;
+export default ListaPedidos;
