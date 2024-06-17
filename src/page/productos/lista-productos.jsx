@@ -225,12 +225,13 @@ const ListaProductos = () => {
 
               {selectedRows.selectedCount === 1 ? (
                 <>
-                  <button
-                    className="transition duration-300 bg-blue-400 hover:bg-blue-500 
+                <Link
+                  to={`../actualizar/${selectedRows.selectedRows[0]._id}`}
+                  className="transition duration-300 bg-blue-400 hover:bg-blue-500 
                 rounded-lg p-2 text-white"
-                  >
-                    <FaPen size={15} />
-                  </button>
+                >
+                  <FaPen size={15} />
+                </Link>
                 </>
               ) : (
                 ""
