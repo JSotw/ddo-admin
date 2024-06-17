@@ -22,7 +22,7 @@ import CrearUsuario from "./page/usuarios/crear-usuario.jsx";
 import ListaProductos from "./page/productos/lista-productos.jsx";
 import CrearProducto from "./page/productos/crear-producto.jsx";
 
-// 
+//
 import "./App.css";
 import ActualizarUsuario from "./page/usuarios/actualizar-usuario.jsx";
 
@@ -36,7 +36,6 @@ const Rutas = () => {
             {/* Rutas de generales */}
             <Route path="/" element={<Login />}></Route>
             <Route path="/recuperar-cuenta" element={<RecuperarCuenta />} />
-            <Route path="/perfil" element={<Perfil />} />
           </Routes>
 
           {/* Rutas de control*/}
@@ -45,7 +44,8 @@ const Rutas = () => {
               <Route element={<RutaProtegida />}>
                 <Route
                   path="/modulo-control/*"
-                  element={<PathModulos modulo={"control"} />}>
+                  element={<PathModulos modulo={"control"} />}
+                >
                   <Route path="lista" element={<Dashboard />} />
                 </Route>
               </Route>
@@ -61,7 +61,10 @@ const Rutas = () => {
                 >
                   <Route path="lista" element={<ListaUsuarios />} />
                   <Route path="crear" element={<CrearUsuario />} />
-                  <Route path="actualizar/:id" element={<ActualizarUsuario />} />
+                  <Route
+                    path="actualizar/:id"
+                    element={<ActualizarUsuario />}
+                  />
                 </Route>
               </Route>
             </Routes>
@@ -82,6 +85,16 @@ const Rutas = () => {
               </Route>
             </Routes>
           </ProductosProvider>
+          <Routes>
+            <Route element={<RutaProtegida />}>
+              <Route
+                path="/modulo-perfil/*"
+                element={<PathModulos modulo={"perfil"} />}
+              >
+                <Route path="perfil" element={<Perfil />} />
+              </Route>
+            </Route>
+          </Routes>
         </AdminLayout>
       </BrowserRouter>
     </AuthProvider>

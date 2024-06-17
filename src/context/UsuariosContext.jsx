@@ -25,6 +25,7 @@ export function UsuariosProvider({ children }) {
   const [usuario, setUsuario] = useState([]); // Obtenemos el usuario
   const [records, setRecords] = useState([]); // Obtenemos todos los registros para buscar en la tabla
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(false);
 
   const [errors, setErrors] = useState([]);
 
@@ -53,8 +54,11 @@ export function UsuariosProvider({ children }) {
     try {
       const res = await crearUsuario(body);
       console.log(res.data);
+      setErr(false);
     } catch (error) {
-      console.error(error);
+      let err = error.response.data.message;
+      console.log(err);
+      setErr(err);
     }
   };
 
@@ -70,8 +74,12 @@ export function UsuariosProvider({ children }) {
     try {
       const res = await actualizarUsuario(id, data);
       console.log(res.data); // Obtenemos el usuario actualizado
+      setErr(false);
+      return res.data;
     } catch (error) {
       console.error(error);
+      let err = error.response.data.message;
+      setErr(err);
     }
   };
 
@@ -93,6 +101,7 @@ export function UsuariosProvider({ children }) {
         usuario,
         records,
         loading,
+        err,
 
         // Funciones
         setRecords,

@@ -10,7 +10,7 @@ const perfil = () => {
           {user && user.imagen_perfil ? (
             <img
               src={user.imagen_perfil}
-              className="text-lg leading-6 font-medium text-gray-900"
+              className="text-lg leading-6 font-medium text-gray-900 w-36 h-36 rounded-3xl shadow-md"
             />
           ) : (
             <FaUserAlt size={40}/>

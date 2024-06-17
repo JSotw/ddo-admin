@@ -67,7 +67,20 @@ const ActualizarUsuario = () => {
   const onSubmit = handleSubmit(async (data) => {
     let dataCorreo = document.getElementById("correo").value;
     let errorCorreo = document.getElementById("error__correo");
+    try {
+      if (file) {
+        const url = await uploadFile(`usuarios/${data.nombre_usuario}/`, file);
+        //console.log(url);
+        data.imagen_perfil = url;
+      } else {
+        data.imagen_perfil = "";
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
     if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
+      openLoading();
       const usuarioData = {
         primer_n: data.primer_n,
         segundo_n: data.segundo_n,
@@ -76,11 +89,24 @@ const ActualizarUsuario = () => {
         correo: dataCorreo,
         nombre_usuario: data.nombre_usuario,
         contrasenia: data.contrasenia,
-        imagen_perfil: "",
+        imagen_perfil: data.imagen_perfil,
         rol: data.rol,
-        activo: data.activo,
+        activo: true,
       };
-      uploadDB(usuarioData);
+      putUsuario(params.id, usuarioData);
+      const timer = setTimeout(() => {
+        console.log(err);
+        if (err === false) {
+          return navigate("/modulo-usuarios/lista", {
+            state: { toast: "success", usuario: data.nombre_usuario },
+          });
+        } else {
+          return navigate("/modulo-usuarios/lista", {
+            state: { toast: "error", err: err },
+          });
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
     } else {
       errorCorreo.textContent = "Correo ingresado incorrecto";
     }
@@ -233,61 +259,7 @@ const ActualizarUsuario = () => {
                 )}
               </div>
             </div>
-            <div className="flex flex-wrap -mx-3 mb-2">
-              <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label
-                  className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                  htmlFor="nombre_usuario"
-                >
-                  Usuario (*)
-                </label>
-                <input
-                  disabled={true}
-                  className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 
-                    py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                  id="nombre_usuario"
-                  {...register("nombre_usuario", { required: true })}
-                  placeholder="1234Abc"
-                />
-                {errors.nombre_usuario && (
-                  <p className="text-red-500 text-xs">Se requiere un usuario</p>
-                )}
-              </div>
-              <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label
-                  className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                  htmlFor="grid-state"
-                >
-                  Contraseña (*)
-                </label>
-                <div className="flex justify-around items-center relative">
-                  <input
-                    className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 
-                    py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    id="contrasenia"
-                    type={showPassword ? "text" : "password"}
-                    {...register("contrasenia", { required: true })}
-                    placeholder="1234Abc"
-                  />
-                  <button
-                    className="p-1 rounded-lg  absolute right-4 transition duration-200"
-                    onClick={toggleShowPassword}
-                    type="button"
-                  >
-                    {showPassword ? (
-                      <RiEyeOffFill size={20} />
-                    ) : (
-                      <RiEyeFill size={20} />
-                    )}
-                  </button>
-                </div>
-                {errors.contrasenia && (
-                  <p className="text-red-500 text-xs">
-                    Se requiere una contraseña
-                  </p>
-                )}
-              </div>
-            </div>
+
             <div className="flex flex-wrap -mx-3 mb-6 pt-5">
               <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                 <label

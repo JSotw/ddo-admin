@@ -3,7 +3,7 @@ const ToastContent = ({ toast, modulo, text }) => {
     return (
       <article className="px-4 py-2">
         <h5>Guardado con éxito</h5>
-        <div className="flex gap-2">
+        <div className="flex gap-2 text-sm">
           <span className="font-bold capitalize">{modulo}:</span>
           <span className="text-gray-400">{text}</span>
         </div>
@@ -14,8 +14,7 @@ const ToastContent = ({ toast, modulo, text }) => {
     return (
       <article className="px-4 py-2">
         <h5>Error al guardar</h5>
-        <div className="flex gap-2">
-          <span className="font-bold capitalize">{modulo}:</span>
+        <div className="flex gap-2 text-sm">
           <span className="text-gray-400">{text}</span>
         </div>
       </article>

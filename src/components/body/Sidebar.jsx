@@ -62,7 +62,7 @@ export default function Sidebar({
                   className="p-1.5 rounded-lg bg-amber-300 hover:bg-amber-400 transition duration-300"
                   onClick={() => setShowPerfil(!showPerfil)}
                 >
-                  <LuMoreVertical  size={20} />
+                  <LuMoreVertical size={20} />
                 </button>
                 {showPerfil && <PerfilMenu />}
               </div>
@@ -86,17 +86,19 @@ export default function Sidebar({
                   {nombre_completo ? nombre_completo : ""}
                 </span>
               </div>
-              {imagen_perfil ? (
-                <img
-                  src={imagen_perfil}
-                  className="w-10 p-2 h-10 rounded-xl shadow-md"
-                  alt=""
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center">
-                  <FaUser size={20} />
-                </div>
-              )}
+              <div className="grid place-items-center p-1">
+                {imagen_perfil ? (
+                  <img
+                    src={imagen_perfil}
+                    className="w-10 h-10 rounded-xl shadow-sm"
+                    alt=""
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-xl shadow-sm grid place-items-center bg-amber-100">
+                    <FaUser size={20} />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </nav>

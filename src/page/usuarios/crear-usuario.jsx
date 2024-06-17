@@ -2,8 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { useUsuarios } from "../../context/UsuariosContext.jsx";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
+import { uploadFile } from "../../firebase/config.js";
+import { ToastContainer } from "react-toastify";
+import { openLoading } from "../../components/toast/OpenType.jsx";
 
 const CrearUsuario = () => {
   const {
@@ -12,31 +15,14 @@ const CrearUsuario = () => {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { postUsuario } = useUsuarios();
+  const { postUsuario, err } = useUsuarios();
   const { user } = useAuth();
   const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const [showPassword, setShowPassword] = useState(false);
+  const [file, setFile] = useState(null);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
-  };
-
-  const uploadDB = async (data) => {
-    try {
-      const res = await postUsuario(data);
-      if (res) {
-        return navigate("/modulo-usuarios/lista", {
-          state: { toast: "success", usuario: data.nombre_usuario },
-        });
-      } else {
-        return navigate("/modulo-usuarios/lista", {
-          state: { toast: "error", usuario: data.nombre_usuario },
-        });
-      }
-      
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   const onKeyUpValidate = (e) => {
@@ -51,8 +37,20 @@ const CrearUsuario = () => {
   const onSubmit = handleSubmit(async (data) => {
     let dataCorreo = document.getElementById("correo").value;
     let errorCorreo = document.getElementById("error__correo");
+    try {
+      if (file) {
+        const url = await uploadFile(`usuarios/${data.nombre_usuario}/`, file);
+        //console.log(url);
+        data.imagen_perfil = url;
+      } else {
+        data.imagen_perfil = "";
+      }
+    } catch (error) {
+      console.error(error);
+    }
 
     if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
+      openLoading();
       const usuarioData = {
         primer_n: data.primer_n,
         segundo_n: data.segundo_n,
@@ -61,11 +59,24 @@ const CrearUsuario = () => {
         correo: dataCorreo,
         nombre_usuario: data.nombre_usuario,
         contrasenia: data.contrasenia,
-        imagen_perfil: "",
+        imagen_perfil: data.imagen_perfil,
         rol: data.rol,
         activo: true,
       };
-      uploadDB(usuarioData);
+      postUsuario(usuarioData);
+      const timer = setTimeout(() => {
+        console.log(err);
+        if (err === false) {
+          return navigate("/modulo-usuarios/lista", {
+            state: { toast: "success", usuario: data.nombre_usuario },
+          });
+        } else {
+          return navigate("/modulo-usuarios/lista", {
+            state: { toast: "error", err: err },
+          });
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
     } else {
       errorCorreo.textContent = "Correo ingresado incorrecto";
     }
@@ -74,6 +85,7 @@ const CrearUsuario = () => {
   return (
     <>
       <section className="flex gap-4 flex-wrap">
+        <ToastContainer />
         <div className="shadow w-auto p-5 rounded">
           <form
             className="w-full max-w-lg text-sm"
@@ -125,7 +137,7 @@ const CrearUsuario = () => {
                   className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                   htmlFor="apellido_p"
                 >
-                  Apellido Paterno
+                  Apellido Paterno (*)
                 </label>
                 <input
                   className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 
@@ -154,13 +166,8 @@ const CrearUsuario = () => {
                   id="apellido_m"
                   type="text"
                   placeholder="Pérez"
-                  {...register("apellido_m", { required: true })}
+                  {...register("apellido_m")}
                 />
-                {errors.apellido_m && (
-                  <p className="text-red-500 mt-0 text-xs flex">
-                    Se requiere el apellido materno
-                  </p>
-                )}
               </div>
             </div>
 
@@ -301,6 +308,7 @@ const CrearUsuario = () => {
                   type="file"
                   accept=".jpg, .jpeg, .png, .webp"
                   {...register("imagen_perfil")}
+                  onChange={(e) => setFile(e.target.files[0])}
                 />
               </div>
             </div>

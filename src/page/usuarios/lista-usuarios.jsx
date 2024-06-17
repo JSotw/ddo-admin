@@ -28,7 +28,7 @@ const ListaUsuarios = () => {
       if (estado.toast === "success") {
         openSuccess("usuario", estado.usuario);
       } else if (estado.toast === "error") {
-        openError("usuario", estado.usuario);
+        openError("err", estado.err);
       }
     }
     navigate(location.pathname, { replace: true });
@@ -142,16 +142,12 @@ const ListaUsuarios = () => {
     },
   ];
 
-  // const elements = document.querySelectorAll(".rdt_TableCell");
-  // elements.forEach((element) => {
-  //   const innerDiv = element.querySelector('div[data-tag="allowRowEvents"]');
-  //   if (innerDiv && innerDiv.textContent.trim().toLowerCase() === "activo") {
-  //     innerDiv.classList.add("text-white", "bg-green-300", "rounded-lg", "px-2", "py-1");
-  //   }
-  // });
+  //Filtrar los datos por nombre de usuario
+  const filteredData = usuarios.filter(row => row.nombre_usuario !== 'admin');
+  const filteredRecords = records.filter(row => row.nombre_usuario !== 'admin');
 
   const searchChange = (e) => {
-    const filteredRecords = usuarios.filter((record) => {
+    const filteredRecords = filteredData.filter((record) => {
       return record.primer_n
         .toLowerCase()
         .includes(e.target.value.toLowerCase());
@@ -178,6 +174,7 @@ const ListaUsuarios = () => {
     );
   };
 
+  // Opciones personalizadas (español)
   const paginationOptions = {
     rowsPerPageText: "Filas por página:",
     rangeSeparatorText: "de",
@@ -252,7 +249,7 @@ const ListaUsuarios = () => {
           </div>
           <div className="w-[720px] h-[500px] overflow-y-scroll ">
             <DataTable
-              data={records}
+              data={filteredRecords}
               columns={columns}
               defaultSortFieldId={4}
               fixedHeader={true}

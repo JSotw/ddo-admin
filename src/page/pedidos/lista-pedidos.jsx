@@ -5,7 +5,7 @@ import { FaPen, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { toast, Bounce, ToastContainer } from "react-toastify";
 import { IoIosSend } from "react-icons/io";
 
-import DataTable, { createTheme } from "react-data-table-component";
+import DataTable from "react-data-table-component";
 
 import { openAdd } from "../../components/toast/OpenType.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
