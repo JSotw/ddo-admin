@@ -77,6 +77,7 @@ const Rutas = () => {
                   {/* Rutas anidadas */}
                   <Route path="lista" element={<ListaProductos />} />
                   <Route path="crear" element={<CrearProducto />} />
+                  <Route path="actualizar/:id" element={<CrearProducto />} />
                 </Route>
               </Route>
             </Routes>
