@@ -23,14 +23,12 @@ const ActualizarUsuario = () => {
       if (params.id) {
         //console.log(params.id);
         const usuario = await getUsuario(params.id);
-        //console.log(usuario);
+        console.log(usuario);
         setValue("primer_n", usuario.primer_n);
         setValue("segundo_n", usuario.segundo_n);
         setValue("apellido_p", usuario.apellido_p);
         setValue("apellido_m", usuario.apellido_m);
         setValue("correo", usuario.correo);
-        setValue("nombre_usuario", usuario.nombre_usuario);
-        setValue("contrasenia", usuario.contrasenia);
         setValue("imagen_perfil", usuario.imagen_perfil);
         setValue("rol", usuario.rol);
         setValue("activo", usuario.activo);
@@ -45,9 +43,9 @@ const ActualizarUsuario = () => {
     setShowPassword(!showPassword);
   };
 
-  const uploadDB = async (id, data) => {
+  const uploadDB = async (data) => {
     try {
-      const res = await putUsuario(id, data);
+      const res = await putUsuario(params.id, data);
       console.log(res);
       return navigate("/modulo-usuarios/lista", {
         state: { toast: "success", usuario: data.nombre_usuario },
@@ -68,9 +66,7 @@ const ActualizarUsuario = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     let dataCorreo = document.getElementById("correo").value;
-    //console.log(dataCorreo);
     let errorCorreo = document.getElementById("error__correo");
-
     if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
       const usuarioData = {
         primer_n: data.primer_n,
@@ -84,7 +80,7 @@ const ActualizarUsuario = () => {
         rol: data.rol,
         activo: data.activo,
       };
-      uploadDB(params.id, usuarioData);
+      uploadDB(usuarioData);
     } else {
       errorCorreo.textContent = "Correo ingresado incorrecto";
     }
@@ -216,6 +212,7 @@ const ActualizarUsuario = () => {
                     className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 
                     py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="activo"
+                    name="activo"
                     {...register("activo", { required: true })}
                   >
                     <option value="true">Activo</option>
@@ -245,6 +242,7 @@ const ActualizarUsuario = () => {
                   Usuario (*)
                 </label>
                 <input
+                  disabled={true}
                   className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 
                     py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   id="nombre_usuario"

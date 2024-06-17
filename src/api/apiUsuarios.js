@@ -5,6 +5,6 @@ export const obtenerUsuarios = () => axios.get(`/obtener-usuarios`);
 export const crearUsuario = (usuario) => axios.post(`/crear-usuario`, usuario);
 
 export const obtenerUsuario = (id) => axios.get(`/obtener-usuario/${id}`,);
-export const actualizarUsuario = (id, usuario) => axios.put(`/actualizar-usuario/${id}`, usuario);
+export const actualizarUsuario = (id, data) => axios.put(`/actualizar-usuario/${id}`, data);
 
 export const eliminarUsuario = (id) => axios.delete(`/eliminar-usuario/${id}`);

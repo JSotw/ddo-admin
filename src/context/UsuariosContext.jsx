@@ -69,7 +69,7 @@ export function UsuariosProvider({ children }) {
   const putUsuario = async (id, data) => {
     try {
       const res = await actualizarUsuario(id, data);
-      console.log(res.data);
+      console.log(res.data); // Obtenemos el usuario actualizado
     } catch (error) {
       console.error(error);
     }
