@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { actualizarPedido, crearPedido, obtenerPedidos, obtenerPedido, eliminarPedido } from "../api/apiPedidos";
 import { obtenerProductos, obtenerProducto, obtenerProductoCodigo } from "../api/apiProductos";
+import { obtenerMediosPago } from "../api/apiPagos";
 
 
 const PedidosContext = createContext();
@@ -21,7 +22,12 @@ export function PedidosProvider({ children }) {
   const [recordsProductos, setRecordsProductos] = useState([]);
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pedidoId, setPedidoId] = useState(0);
+  const [pedidoId, setPedidoId] = useState("");
+  const [cliente, setCliente] = useState("");
+  const [montoTotal, setMontoTotal] = useState(0);
+  const [countDetalles, setCountDetalles] = useState(0);
+  const [detalles, setDetalles] = useState([]);
+  const [mediosPago, setMediosPago] = useState([]);
 
   const [errors, setErrors] = useState([]);
 
@@ -34,12 +40,22 @@ export function PedidosProvider({ children }) {
     }
   }, [errors]);
 
-  const getPedidos = async (desde, hasta) => {
+  const getPedidos = async (desde, hasta, estado) => {
     try {
-      const res = await obtenerPedidos(desde, hasta);
+      const res = await obtenerPedidos(desde, hasta, estado);
       setLoading(false);
       setPedidos(res.data);
       setRecords(res.data);
+    } catch (error) {
+      setLoading(true);
+      console.error(error);
+    }
+  };
+  const getMediosPago = async () => {
+    try {
+      const res = await obtenerMediosPago();
+      setLoading(false);
+      setMediosPago(res.data);
     } catch (error) {
       setLoading(true);
       console.error(error);
@@ -61,7 +77,9 @@ export function PedidosProvider({ children }) {
     try {
       const res = await crearPedido(body);
       if(res.status === 200){
-        console.log(res);
+        setPedidoId(res.data._id);
+        console.log("creado");
+        console.log(res.data);
       }else{
 
       }
@@ -73,6 +91,10 @@ export function PedidosProvider({ children }) {
   const putPedido = async (id, body) => {
     try {
       const res = await actualizarPedido(id, body);
+      if(res.status === 200){
+        console.log("actualizado");
+        console.log(res.data);
+      }
       return res;
     } catch (error) {
       return error;
@@ -110,7 +132,7 @@ export function PedidosProvider({ children }) {
       const res = await eliminarPedido(id);
       if (res.status === 204){
         setPedidos(pedidos.filter((pedido) => pedido._id !== id));
-        setPedidos(records.filter((pedido) => pedido._id !== id));
+        setRecords(records.filter((pedido) => pedido._id !== id));
       }
       return res;
     } catch (error) {
@@ -127,10 +149,18 @@ export function PedidosProvider({ children }) {
         productos,
         recordsProductos,
         pedidoId,
+        detalles,
+        countDetalles,
+        cliente,
+        mediosPago,
 
         setRecords,
+        setDetalles,
+        setCountDetalles,
         setRecordsProductos,
         getPedidos,
+        setCliente,
+        setPedidoId,
         getPedido,
         postPedido,
         putPedido,
@@ -138,6 +168,7 @@ export function PedidosProvider({ children }) {
         getProductos,
         getProducto,
         getProductoCodigo,
+        getMediosPago,
       }}
     >
       {children}

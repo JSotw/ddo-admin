@@ -1,6 +1,11 @@
 import axios from "./axios.js";
 
-export const obtenerPedidos = (desde, hasta) => axios.get(`/obtener-pedidos/${desde}/${hasta}`);
+export const obtenerPedidos = (desde, hasta, estado = null) => {
+    if(estado === null || estado === undefined)
+        return axios.get(`/obtener-pedidos/${desde}/${hasta}`);
+    else
+        return axios.get(`/obtener-pedidos/${desde}/${hasta}?estado=${estado}`);
+}
 export const obtenerPedido = (id) => axios.get(`/obtener-pedido/${id}`);
 
 export const crearPedido = (pedido) => axios.post(`/crear-pedido`, pedido);
