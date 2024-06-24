@@ -1,13 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useProductos } from "../../context/ProductosContext.jsx";
-import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";  
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useState, useEffect } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 import { ToastContainer, toast, Bounce } from "react-toastify";
-import { FaPlus } from "react-icons/fa";
 
-const CrearProducto = () => {
+const ActualizarProducto = () => {
   const {
     register,
     handleSubmit,
@@ -15,9 +14,10 @@ const CrearProducto = () => {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { postProducto, agregados, setAgregados, getProducto, putProducto } = useProductos();
+  const { agregados, setAgregados, getProducto, putProducto } = useProductos();
   const params = useParams();
   const [error, setError] = useState([]);
+  const [agregadosLength, setAgregadosLength] = useState(0);
   const agregadoBaseName = "agregado_";
   const agregadoBasePrecio = "agregado_precio_";
   const agregadoBaseMax = "agregado_min_";
@@ -26,6 +26,7 @@ const CrearProducto = () => {
   useEffect(() => {
     if (params.id) {
       async function loadProducto(_id) {
+        setAgregados(1);
         const producto = await getProducto(_id);
         setValue("codigo", producto.codigo);
         setValue("nombre", producto.nombre);
@@ -33,17 +34,16 @@ const CrearProducto = () => {
         setValue("precio_base", parseInt(producto.precio_base));
         setValue("activo", producto.activo);
         if(producto.agregados != undefined){
-          await setAgregados(producto.agregados.length);
+          setAgregados(producto.agregados.length);
           [...Array(agregados)].map((x, i) =>{
             if(producto.agregados[i] != undefined){
+              console.log(producto.agregados[i])
               setValue(`${agregadoBaseName}${i}`, producto.agregados[i].nombre);
               setValue(`${agregadoBasePrecio}${i}`, producto.agregados[i].precio);
               setValue(`${agregadoBaseMin}${i}`, producto.agregados[i].minimo_selec);
               setValue(`${agregadoBaseMax}${i}`, producto.agregados[i].maximo_select);
             }
           });
-        }else{
-          setAgregados(1);
         }
       }
       loadProducto(params.id);
@@ -52,25 +52,14 @@ const CrearProducto = () => {
 
   const uploadDB = async (data) => {
     try {
-      if(params.id != undefined){
         const result = await putProducto(params.id, data);
         if(result.status == 200){
-          return navigate("/modulo-productos/lista", {
+            return navigate("/modulo-productos/lista", {
             state: { toast: "success", producto: data.nombre },
-          });
+            });
         }else{
-          setError(result.response.data);
+            setError(result.response.data);
         }
-      }else{
-        const result = await postProducto(data);
-        if(result.status == 200){
-          return navigate("/modulo-productos/lista", {
-            state: { toast: "success", producto: data.nombre },
-          });
-        }else{
-          setError(result.response.data);
-        }
-      }
     } catch (error) {
       console.error(error);
     }
@@ -94,7 +83,7 @@ const CrearProducto = () => {
       descripcion: data.descripcion,
       agregados: _agregados,
       precio_base: parseInt(data.precio_base),
-      activo: true
+      activo: data.activo
     };
     uploadDB(productoData);
   });
@@ -107,7 +96,7 @@ const CrearProducto = () => {
       <section className="flex gap-4 flex-wrap">
       <div className="shadow w-auto p-5 rounded">
           <form
-            className=""
+            className="w-full max-w-lg text-sm"
             onSubmit={onSubmit}
             method="post"
           >
@@ -180,7 +169,7 @@ const CrearProducto = () => {
               )}
             </div>
           </div>
-          {[...Array(agregados)].map((x, i) =>
+          {[...Array(agregadosLength)].map((x, i) =>
           <div className="shadow w-auto p-5 rounded">
             <div className="flex flex-wrap -mx-3 mb-4">
               <div className="w-full px-3">
@@ -324,7 +313,7 @@ const CrearProducto = () => {
               className=" bg-purple-300 hover:bg-purple-400 text-gray-800 font-semibold text-sm py-2 
               px-4 rounded inline-flex items-center justify-center gap-2 transition-all w-full"
             >
-              {params.id && (<span>Actualizar</span>) || (<span>Agregar</span>)}
+              <span>Actualizar</span>
             </button>
             {error != "" ? (
               <label
@@ -338,4 +327,4 @@ const CrearProducto = () => {
     </>
   );
 };
-export default CrearProducto;
+export default ActualizarProducto;

@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 
-const ButtonNavBottom = ({ icon, name }) => {
+const ButtonNavBottom = ({ icon, name, defaultDir = "lista" }) => {
   return (
     <Link
       className="inline-flex flex-col h-auto -mt-8 items-center justify-center rounded-2xl px-2 p-2
       bg-amber-600 hover:text-amber-900 w-auto text-white "
-      to={`/modulo-${name}/lista`}
+      to={`/modulo-${name}/${defaultDir}`}
     >
       {icon}
       <span className="sr-only">{name}</span>

@@ -2,6 +2,7 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { UsuariosProvider } from "./context/UsuariosContext.jsx";
 import { ProductosProvider } from "./context/ProductosContext.jsx";
+import { PedidosProvider } from "./context/PedidosContext.jsx";
 import { ReportProvider } from "./context/ReportsContext.jsx";
 import AdminLayout from "./components/AdminLayout.jsx";
 
@@ -21,8 +22,11 @@ import CrearUsuario from "./page/usuarios/crear-usuario.jsx";
 // Páginas de Productos
 import ListaProductos from "./page/productos/lista-productos.jsx";
 import CrearProducto from "./page/productos/crear-producto.jsx";
+import ActualizarProducto from "./page/productos/actualizar-producto.jsx";
 
-//
+//Páginas de pedidos
+import CrearPedidos from "./page/pedidos/crear-pedido.jsx";
+// 
 import "./App.css";
 import ActualizarUsuario from "./page/usuarios/actualizar-usuario.jsx";
 
@@ -80,21 +84,26 @@ const Rutas = () => {
                   {/* Rutas anidadas */}
                   <Route path="lista" element={<ListaProductos />} />
                   <Route path="crear" element={<CrearProducto />} />
-                  <Route path="actualizar/:id" element={<CrearProducto />} />
+                  <Route path="actualizar/:id" element={<ActualizarProducto />} />
                 </Route>
               </Route>
             </Routes>
           </ProductosProvider>
-          <Routes>
-            <Route element={<RutaProtegida />}>
-              <Route
-                path="/modulo-perfil/*"
-                element={<PathModulos modulo={"perfil"} />}
-              >
-                <Route path="lista" element={<Perfil />} />
+          {/* Rutas del modulo de pedidos */}
+          <PedidosProvider>
+            <Routes>
+              <Route element={<RutaProtegida />}>
+                <Route
+                  path="/modulo-pedidos/*"
+                  element={<PathModulos modulo={"pedidos"} />}
+                >
+                  {/* Rutas anidadas */}
+                  <Route path="crear" element={<CrearPedidos />} />
+                  <Route path="lista" element={<CrearPedidos />} />
+                </Route>
               </Route>
-            </Route>
-          </Routes>
+            </Routes>
+          </PedidosProvider>
         </AdminLayout>
       </BrowserRouter>
     </AuthProvider>

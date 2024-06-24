@@ -11,6 +11,11 @@ const items = [
   //   name: "ventas",
   // },
   {
+    icon: <FaHamburger size={27} />,
+    name: "pedidos",
+    defaultDir: "crear"
+  },
+  {
     icon: <FaChartPie  size={27} />,
     name: "control",
   },

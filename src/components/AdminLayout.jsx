@@ -15,16 +15,24 @@ const items = [
   //   name: "ventas",
   // },
   {
+    icon: <FaHamburger size={27} />,
+    name: "pedidos",
+    defaultRef: "crear",
+  },
+  {
     icon: <FaChartPie  size={27} />,
     name: "control",
+    defaultRef: "lista",
   },
   {
     icon: <FaHamburger size={27} />,
     name: "productos",
+    defaultRef: "lista",
   },
   {
     icon: <FaUser size={27} />,
     name: "usuarios",
+    defaultRef: "lista",
   },
   
 ];
@@ -44,13 +52,13 @@ function AdminLayout({ children }) {
               nombre_completo={user ? `${user.primer_n} ${user.apellido_p}` : ""}
               imagen_perfil={user ? user.imagen_perfil : ""}
             >
-              {items?.map((item, index) =>
+              {items?.map((item, index = "lista") =>
                 items ? (
                   <div key={index}>
                     <SidebarItem
                       icon={item.icon}
                       text={item.name}
-                      href={`/modulo-${item.name}/lista`}
+                      href={`/modulo-${item.name}/${item.defaultRef}`}
                     />
                   </div>
                 ) : (
