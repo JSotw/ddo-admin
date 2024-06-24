@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useState, useEffect } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 import { ToastContainer, toast, Bounce } from "react-toastify";
+import { FaPlus } from "react-icons/fa";
 
 const CrearProducto = () => {
   const {
@@ -106,7 +107,7 @@ const CrearProducto = () => {
       <section className="flex gap-4 flex-wrap">
       <div className="shadow w-auto p-5 rounded">
           <form
-            className="w-full max-w-lg text-sm"
+            className=""
             onSubmit={onSubmit}
             method="post"
           >
