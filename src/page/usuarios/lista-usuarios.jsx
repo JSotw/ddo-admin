@@ -2,11 +2,11 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUsuarios } from "../../context/UsuariosContext.jsx";
-import { FaPen, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
+import { FaAngleRight, FaPen, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { toast, Bounce, ToastContainer } from "react-toastify";
-import { IoIosSend } from "react-icons/io";
+import { TbMailPlus } from "react-icons/tb";
 
-import DataTable, { createTheme } from "react-data-table-component";
+import DataTable from "react-data-table-component";
 
 import { openSuccess, openError } from "../../components/toast/OpenType.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -20,6 +20,7 @@ const ListaUsuarios = () => {
   const location = useLocation();
   const estado = location.state;
   const [selectedRows, setSelectedRows] = useState([]);
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     getUsuarios();
@@ -120,31 +121,63 @@ const ListaUsuarios = () => {
     );
   };
 
+  const conditionalCellStyles = [
+    {
+      when: (row) => row["activo"] === true,
+      style: {
+        backgroundColor: "#CFFFD4",
+      },
+    },
+    {
+      when: (row) => row["activo"] === false,
+      style: {
+        backgroundColor: "#FFCFEC",
+      },
+    },
+  ];
   const columns = [
     {
       name: "Nombre",
       selector: (row) => `${row.primer_n} ${row.apellido_p}`,
       sortable: true,
+      width: "170px",
     },
     {
       name: "Usuario",
       selector: (row) => row.nombre_usuario,
+      width: "170px",
     },
     {
       name: "Rol",
       selector: (row) => row.rol,
       id: "rol",
+      width: "170px",
     },
     {
       name: "Estado",
       selector: (row) => `${row.activo ? "Activo" : "Inactivo"}`,
       sortable: true,
+      conditionalCellStyles,
+      width: "100px",
+      style: {
+        color: "black",
+        fontWeight: "bold",
+        fontSize: "12px",
+        margin: "10px",
+        width: "100%",
+        display: "flex",
+        borderRadius: "15px",
+        justifyContent: "center",
+        textTransform: "capitalize",
+      },
     },
   ];
 
   //Filtrar los datos por nombre de usuario
-  const filteredData = usuarios.filter(row => row.nombre_usuario !== 'admin');
-  const filteredRecords = records.filter(row => row.nombre_usuario !== 'admin');
+  const filteredData = usuarios.filter((row) => row.nombre_usuario !== "admin");
+  const filteredRecords = records.filter(
+    (row) => row.nombre_usuario !== "admin"
+  );
 
   const searchChange = (e) => {
     const filteredRecords = filteredData.filter((record) => {
@@ -156,24 +189,6 @@ const ListaUsuarios = () => {
     //console.log(records);
   };
 
-  const ExpandableRows = ({ data }) => {
-    let user = JSON.stringify(data);
-    let userData = JSON.parse(user);
-    return (
-      <section className=" bg-white rounded-b-lg z-4 w-full h-auto text-sm ">
-        <div className=" rounded-lg flex items-center gap-2 p-2 text-black">
-          <a
-            className="text-white bg-amber-700 shadow-md flex items-center gap-2 px-3 py-1 rounded-lg"
-            href={`mailto:${userData.correo}?subject=Contacto DDO`}
-          >
-            {userData.correo}
-            <IoIosSend />
-          </a>
-        </div>
-      </section>
-    );
-  };
-
   // Opciones personalizadas (español)
   const paginationOptions = {
     rowsPerPageText: "Filas por página:",
@@ -181,23 +196,47 @@ const ListaUsuarios = () => {
     noRowsPerPage: false,
   };
 
-  const customCellStyles = [
-    {
-      // Aplicar estilo a la celda con la clave 'activo'
-      on: "cell",
-      key: "activo",
-      style: (rowData) => ({
-        color: rowData.activo ? "red" : "inherit", // Usar rowData.activo directamente
-      }),
-    },
-  ];
+  const ExpandableRows = ({ data }) => {
+    let user = JSON.stringify(data);
+    let userData = JSON.parse(user);
+    let correo = userData["correo"];
+    let nombreUsuario = userData["nombre_usuario"];
+    let subject = `Contacto DDO: ${nombreUsuario}`;
+    return (
+      <section className="animate-duration-300 bg-white z-30 shadow-sm animate-flip-down rounded-b-lg z-4 w-full h-auto text-sm">
+        <div className=" rounded-lg flex items-center gap-2 p-2 text-black">
+          <a
+            className="text-black bg-gray-50 shadow-md flex items-center gap-2 px-3 py-2 rounded-lg"
+            href={`mailto:${correo}?subject=${subject}`}
+          >
+            {correo}
+            <TbMailPlus width={30} />
+          </a>
+          <FaAngleRight />
+          <p className="font-semibold text-sm ">{subject}</p>
+        </div>
+      </section>
+    );
+  };
+  const handleRowClicked = (row) => {
+    if (expandedRow === row["nombre_usuario"]) {
+      // Si la fila actualmente expandida se hace clic de nuevo, cierra la expansión
+      setExpandedRow(null);
+    } else {
+      // Si se hace clic en una nueva fila expandible, expande esa fila y cierra cualquier otra fila expandida
+      setExpandedRow(row["nombre_usuario"]);
+    }
+  };
 
   if (usuarios) {
     return (
       <main>
-        <section className="flex flex-col gap-4 w-auto">
+        <section className="flex flex-col gap-0 shadow-md rounded-xl w-auto">
           <ToastContainer />
-          <div className="flex m-full gap-2 px-4 justify-between items-center py-2 bg-amber-100 text-sm rounded-t-2xl">
+          <div
+            className="flex m-full gap-2 px-4 justify-between items-center py-2
+             bg-amber-100 text-sm rounded-t-xl"
+          >
             <p className="font-semibold text-amber-900">Lista de Usuarios</p>
             <div className="flex gap-2">
               <div className="flex gap-2 relative">
@@ -247,39 +286,33 @@ const ListaUsuarios = () => {
               )}
             </div>
           </div>
-          <div className="w-[720px] h-[500px] overflow-y-scroll ">
+          <div className="min-h-[500px] w-[700px] bg-white  rounded-xl">
             <DataTable
-              data={filteredRecords}
+              className="cursor-pointer"
+              highlightOnHover={true}
+              data={records}
               columns={columns}
-              defaultSortFieldId={4}
               fixedHeader={true}
-              fixedHeaderScrollHeight="700px"
-              selectableRows={true}
               pagination={true}
               paginationRowsPerPageOptions={[3, 6, 8]} // Opciones de paginación personalizadas
               paginationPerPage={8}
-              paginationComponentOptions={paginationOptions}
+              defaultSortFieldId={1} // Campo por el cual ordenar
+              defaultSortAsc={false} // Orden descendente por defecto
+              paginationComponentOptions={paginationOptions} // Opciones de paginación personalizadas
+              noDataComponent={<NoDataComponent />}
+              expandableRows={true}
+              expandableRowExpanded={(row) =>
+                row["nombre_usuario"] === expandedRow
+              }
+              fixedHeaderScrollHeight="700px"
+              selectableRows={true}
               onSelectedRowsChange={(row) => setSelectedRows(row)}
               progressPending={loading}
               progressComponent={<LoadingData />}
-              expandableRows={true}
               expandableRowsComponent={ExpandableRows}
-              conditionalCellStyles={customCellStyles}
-              noDataComponent={<NoDataComponent />}
-              conditionalRowStyles={[
-                {
-                  when: (rowData) => rowData.activo === true,
-                  style: {
-                    backgroundColor: "#e9ffea", // Color de fondo para filas activas
-                  },
-                },
-                {
-                  when: (rowData) => rowData.activo === false,
-                  style: {
-                    backgroundColor: "#ffc2c2", // Color de fondo para filas inactivas
-                  },
-                },
-              ]}
+              onRowClicked={handleRowClicked}
+              expandableRowsHideExpander={true}
+              loadingComponent={LoadingData}
             />
           </div>
         </section>

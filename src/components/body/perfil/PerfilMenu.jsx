@@ -6,11 +6,11 @@ const PerfilMenu = () => {
   const { logout } = useAuth();
 
   return (
-    <nav className="absolute z-10 bottom-16 left-0 w-full p-1">
+    <nav className="absolute z-10 bottom-16 left-0 w-full p-1 animate-duration-300 animate-flip-up">
       <ul className="flex flex-col gap-2 p-2 bg-white shadow-sm rounded-lg w-full h-auto ">
         <li className="">
           <Link
-            to="/perfil"
+            to="/modulo-perfil/lista"
             className="text-black flex items-center text-xs gap-1 
             hover:text-amber-500 transition duration-300"
           >

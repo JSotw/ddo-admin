@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 import { uploadFile } from "../../firebase/config.js";
 import { ToastContainer } from "react-toastify";
-import { openLoading } from "../../components/toast/OpenType.jsx";
+import { openError, openLoading } from "../../components/toast/OpenType.jsx";
 
 const CrearUsuario = () => {
   const {
@@ -15,11 +15,16 @@ const CrearUsuario = () => {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { postUsuario, err } = useUsuarios();
+  const { postUsuario, getUsuarios, usuarios } = useUsuarios();
   const { user } = useAuth();
   const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const [showPassword, setShowPassword] = useState(false);
   const [file, setFile] = useState(null);
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    getUsuarios();
+  }, []);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -49,39 +54,60 @@ const CrearUsuario = () => {
       console.error(error);
     }
 
-    if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
-      openLoading();
-      const usuarioData = {
-        primer_n: data.primer_n,
-        segundo_n: data.segundo_n,
-        apellido_p: data.apellido_p,
-        apellido_m: data.apellido_m,
-        correo: dataCorreo,
-        nombre_usuario: data.nombre_usuario,
-        contrasenia: data.contrasenia,
-        imagen_perfil: data.imagen_perfil,
-        rol: data.rol,
-        activo: true,
-      };
-      postUsuario(usuarioData);
-      const timer = setTimeout(() => {
-        console.log(err);
-        if (err === false) {
-          return navigate("/modulo-usuarios/lista", {
-            state: { toast: "success", usuario: data.nombre_usuario },
-          });
-        } else {
-          return navigate("/modulo-usuarios/lista", {
-            state: { toast: "error", err: err },
-          });
-        }
-      }, 3000);
-      return () => clearTimeout(timer);
+    const findUser = usuarios.find(
+      (user) => user.nombre_usuario === data.nombre_usuario
+    );
+    console.log(findUser);
+    if (findUser === undefined) {
+      if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
+        const usuarioData = {
+          primer_n: data.primer_n,
+          segundo_n: data.segundo_n,
+          apellido_p: data.apellido_p,
+          apellido_m: data.apellido_m,
+          correo: dataCorreo,
+          nombre_usuario: data.nombre_usuario,
+          contrasenia: data.contrasenia,
+          imagen_perfil: data.imagen_perfil,
+          rol: data.rol,
+          activo: true,
+        };
+        openLoading();
+        postUsuario(usuarioData);
+        return navigate("/modulo-usuarios/lista", {
+          state: { toast: "success", usuario: data.nombre_usuario },
+        });
+      } else {
+        errorCorreo.textContent = "Correo ingresado incorrecto";
+      }
     } else {
-      errorCorreo.textContent = "Correo ingresado incorrecto";
+      openError("usuarios", "El usuario ya existe");
     }
   });
 
+  const onKeyUpUser = () => {
+    let nombre = document.getElementById("primer_n").value;
+    let apellido = document.getElementById("apellido_p").value;
+    // Convertir a minúsculas y normalizar para eliminar caracteres especiales
+    nombre = normalizarTexto(nombre);
+    apellido = normalizarTexto(apellido);
+
+    let nombreUsuario = `ddo.${nombre.slice(0, 2)}${apellido}`;
+
+    //console.log(nombreUsuario);
+    setUsername(nombreUsuario);
+    // Asignar los nuevos valores como nombre de usuario y contraseña
+    document.getElementById("nombre_usuario").value = nombreUsuario;
+    document.getElementById("contrasenia").value = nombreUsuario;
+  };
+  console.log(username);
+  function normalizarTexto(texto) {
+    // Descomponer el texto para eliminar caracteres especiales
+    return texto
+      .normalize("NFD") 
+      .replace(/[\u0300-\u036f]/g, "") 
+      .toLowerCase(); 
+  }
   return (
     <>
       <section className="flex gap-4 flex-wrap">
@@ -107,6 +133,7 @@ const CrearUsuario = () => {
                   {...register("primer_n", { required: true })}
                   type="text"
                   placeholder="José"
+                  onKeyUp={onKeyUpUser}
                 />
                 {errors.primer_n && (
                   <p className="text-red-500 mt-0 text-xs flex">
@@ -146,6 +173,7 @@ const CrearUsuario = () => {
                   type="text"
                   placeholder="González"
                   {...register("apellido_p", { required: true })}
+                  onKeyUp={onKeyUpUser}
                 />
                 {errors.apellido_p && (
                   <p className="text-red-500 mt-0 text-xs flex">
@@ -206,6 +234,8 @@ const CrearUsuario = () => {
                   className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 
                     py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   id="nombre_usuario"
+                  disabled={true}
+                  value={username}
                   {...register("nombre_usuario", { required: true })}
                   placeholder="1234Abc"
                 />
@@ -228,6 +258,8 @@ const CrearUsuario = () => {
                     type={showPassword ? "text" : "password"}
                     {...register("contrasenia", { required: true })}
                     placeholder="1234Abc"
+                    disabled={true}
+                    value={username}
                   />
                   <button
                     className="p-1 rounded-lg  absolute right-4 transition duration-200"

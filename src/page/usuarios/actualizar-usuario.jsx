@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useEffect, useState } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
+import { uploadFile } from "../../firebase/config.js";
+import { openError, openLoading } from "../../components/toast/OpenType.jsx";
 
 const ActualizarUsuario = () => {
   const {
@@ -13,17 +15,19 @@ const ActualizarUsuario = () => {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { getUsuario, putUsuario } = useUsuarios();
+  const { getUsuario, putUsuario, err } = useUsuarios();
   const { user } = useAuth();
   const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const [showPassword, setShowPassword] = useState(false);
+  const [file, setFile] = useState(null);
+  const [imagenPerfil, setImagenPerfil] = useState(null);
+  const [nombreUsuario, setNombreUsuario] = useState(null);
   const params = useParams();
   useEffect(() => {
     async function loadUsuario() {
       if (params.id) {
         //console.log(params.id);
         const usuario = await getUsuario(params.id);
-        console.log(usuario);
+        //console.log(usuario);
         setValue("primer_n", usuario.primer_n);
         setValue("segundo_n", usuario.segundo_n);
         setValue("apellido_p", usuario.apellido_p);
@@ -32,28 +36,14 @@ const ActualizarUsuario = () => {
         setValue("imagen_perfil", usuario.imagen_perfil);
         setValue("rol", usuario.rol);
         setValue("activo", usuario.activo);
+        setImagenPerfil(usuario.imagen_perfil);
+        setNombreUsuario(usuario.nombre_usuario);
       }
     }
     loadUsuario();
   }, []);
 
   //console.log(locationId);
-
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const uploadDB = async (data) => {
-    try {
-      const res = await putUsuario(params.id, data);
-      console.log(res);
-      return navigate("/modulo-usuarios/lista", {
-        state: { toast: "success", usuario: data.nombre_usuario },
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const onKeyUpValidate = (e) => {
     let errorCorreo = document.getElementById("error__correo");
@@ -80,33 +70,27 @@ const ActualizarUsuario = () => {
     }
 
     if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
-      openLoading();
+      if (data.imagen_perfil != "") {
+        setImagenPerfil(data.imagen_perfil);
+      }
+      console.log(imagenPerfil);
       const usuarioData = {
         primer_n: data.primer_n,
         segundo_n: data.segundo_n,
         apellido_p: data.apellido_p,
         apellido_m: data.apellido_m,
         correo: dataCorreo,
-        nombre_usuario: data.nombre_usuario,
-        contrasenia: data.contrasenia,
-        imagen_perfil: data.imagen_perfil,
+        imagen_perfil: imagenPerfil,
         rol: data.rol,
-        activo: true,
+        activo: data.activo,
       };
-      putUsuario(params.id, usuarioData);
-      const timer = setTimeout(() => {
-        console.log(err);
-        if (err === false) {
-          return navigate("/modulo-usuarios/lista", {
-            state: { toast: "success", usuario: data.nombre_usuario },
-          });
-        } else {
-          return navigate("/modulo-usuarios/lista", {
-            state: { toast: "error", err: err },
-          });
-        }
-      }, 3000);
-      return () => clearTimeout(timer);
+      //console.log(usuarioData, params.id);
+      await putUsuario(params.id, usuarioData);
+      // console.log("timer:", err);
+      openLoading();
+      return navigate("/modulo-usuarios/lista", {
+        state: { toast: "success", usuario: nombreUsuario },
+      });
     } else {
       errorCorreo.textContent = "Correo ingresado incorrecto";
     }
@@ -195,13 +179,8 @@ const ActualizarUsuario = () => {
                   id="apellido_m"
                   type="text"
                   placeholder="Pérez"
-                  {...register("apellido_m", { required: true })}
+                  {...register("apellido_m")}
                 />
-                {errors.apellido_m && (
-                  <p className="text-red-500 mt-0 text-xs flex">
-                    Se requiere el apellido materno
-                  </p>
-                )}
               </div>
             </div>
             <div className="flex flex-wrap -mx-3 mb-2">

@@ -22,10 +22,9 @@ export const useUsuarios = () => {
 
 export function UsuariosProvider({ children }) {
   const [usuarios, setUsuarios] = useState([]); // Obtenemos todos los usuarios de la base de datos
-  const [usuario, setUsuario] = useState([]); // Obtenemos el usuario
   const [records, setRecords] = useState([]); // Obtenemos todos los registros para buscar en la tabla
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState(false);
+  const [err, setErr] = useState(null);
 
   const [errors, setErrors] = useState([]);
 
@@ -54,11 +53,9 @@ export function UsuariosProvider({ children }) {
     try {
       const res = await crearUsuario(body);
       console.log(res.data);
-      setErr(false);
     } catch (error) {
-      let err = error.response.data.message;
+      setErr(error.response.data.message);
       console.log(err);
-      setErr(err);
     }
   };
 
@@ -74,12 +71,9 @@ export function UsuariosProvider({ children }) {
     try {
       const res = await actualizarUsuario(id, data);
       console.log(res.data); // Obtenemos el usuario actualizado
-      setErr(false);
-      return res.data;
     } catch (error) {
       console.error(error);
-      let err = error.response.data.message;
-      setErr(err);
+      setErr(error.response.data.message);
     }
   };
 
@@ -98,7 +92,6 @@ export function UsuariosProvider({ children }) {
       value={{
         // Datos
         usuarios,
-        usuario,
         records,
         loading,
         err,
@@ -110,6 +103,7 @@ export function UsuariosProvider({ children }) {
         getUsuarios,
         postUsuario,
         deleteUsuario,
+        setErr,
       }}
     >
       {children}

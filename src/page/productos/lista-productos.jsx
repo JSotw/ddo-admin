@@ -4,20 +4,28 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useProductos } from "../../context/ProductosContext.jsx";
 import { FaPen, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { toast, Bounce, ToastContainer } from "react-toastify";
-import { IoIosSend } from "react-icons/io";
+import { FaAngleRight } from "react-icons/fa";
 
-import DataTable, { createTheme } from "react-data-table-component";
+import DataTable from "react-data-table-component";
 
 import { openSuccess } from "../../components/toast/OpenType.jsx";
 
 const ListaProductos = () => {
-  const { getProductos, loading, productos, setRecords, records, deleteProducto } =
-    useProductos();
+  const {
+    getProductos,
+    loading,
+    productos,
+    setRecords,
+    records,
+    deleteProducto,
+  } = useProductos();
   const navigate = useNavigate();
 
   const location = useLocation();
   const estado = location.state;
   const [selectedRows, setSelectedRows] = useState([]);
+
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     getProductos();
@@ -116,28 +124,60 @@ const ListaProductos = () => {
     );
   };
 
+  const conditionalCellStyles = [
+    {
+      when: (row) => row["activo"] === true,
+      style: {
+        backgroundColor: "#CFFFD4",
+      },
+    },
+    {
+      when: (row) => row["activo"] === false,
+      style: {
+        backgroundColor: "#FFCFEC",
+      },
+    },
+  ];
+
   const columns = [
     {
       name: "Codigo",
       selector: (row) => `${row.codigo}`,
       sortable: true,
+      width: "100px",
     },
     {
       name: "Nombre",
       selector: (row) => row.nombre,
+      width: "170px",
     },
     {
       name: "Descripción",
       selector: (row) => row.descripcion,
+      width: "140px",
     },
     {
       name: "Precio Base",
-      selector: (row) => row.precio_base
+      selector: (row) => `$ ${row.precio_base}`,
+      width: "100px",
     },
     {
       name: "Estado",
       selector: (row) => `${row.activo ? "Activo" : "Inactivo"}`,
       sortable: true,
+      conditionalCellStyles,
+      width: "100px",
+      style: {
+        color: "black",
+        fontWeight: "bold",
+        fontSize: "12px",
+        margin: "10px",
+        width: "100%",
+        display: "flex",
+        borderRadius: "15px",
+        justifyContent: "center",
+        textTransform: "capitalize",
+      },
     },
   ];
 
@@ -151,9 +191,7 @@ const ListaProductos = () => {
 
   const searchChange = (e) => {
     const filteredRecords = productos.filter((record) => {
-      return record.nombre
-        .toLowerCase()
-        .includes(e.target.value.toLowerCase());
+      return record.nombre.toLowerCase().includes(e.target.value.toLowerCase());
     });
     setRecords(filteredRecords);
     //console.log(records);
@@ -163,17 +201,33 @@ const ListaProductos = () => {
     let product = JSON.stringify(data);
     let productData = JSON.parse(product);
     return (
+      <section
+        className="animate-duration-300 bg-white z-30 shadow-sm animate-flip-down 
+        rounded-b-lg z-4 w-full h-auto text-sm"
+      >
         <div className=" rounded-lg flex items-center gap-2 p-2 text-black">
           {productData.agregados.map((a) => (
-            <span
+            <article
               key={a.nombre}
-              className={`bg-gray-400 px-3.6 text-xs rounded 
-                py-2.2 inline-block whitespace-nowrap text-center align-baseline font-normal p-1
-                  leading-none text-white `} >
-              {a.precio > 0 ? (`${a.nombre} (+${a.precio})`) : (`${a.nombre}`)}
-            </span>
+              className={`text-black text-[11px] bg-gray-50 shadow-md flex items-center gap-2 
+                  px-3 py-2 rounded-lg `}
+            >
+              {a.precio > 0 ? (
+                <div className="flex flex-col">
+                  <p className="text-black -mb-1"> {a.nombre}</p>
+                  <p className="text-green-500">$ {a.precio}</p>
+                </div>
+              ) : (
+                ``
+              )}
+            </article>
           ))}
+          <FaAngleRight />
+          <p className="font-semibold text-[11px] text-wrap">
+            {productData.descripcion}
+          </p>
         </div>
+      </section>
     );
   };
 
@@ -194,10 +248,20 @@ const ListaProductos = () => {
     },
   ];
 
+  const handleRowClicked = (row) => {
+    if (expandedRow === row["codigo"]) {
+      // Si la fila actualmente expandida se hace clic de nuevo, cierra la expansión
+      setExpandedRow(null);
+    } else {
+      // Si se hace clic en una nueva fila expandible, expande esa fila y cierra cualquier otra fila expandida
+      setExpandedRow(row["codigo"]);
+    }
+  };
+
   if (productos) {
     return (
       <main>
-        <section className="flex flex-col gap-4 w-auto">
+        <section className="flex flex-col gap-0 shadow-md rounded-xl w-auto">
           <ToastContainer />
           <div className="flex m-full gap-2 px-4 justify-between items-center py-2 bg-amber-100 text-sm rounded-t-2xl">
             <p className="font-semibold text-amber-900">Lista de Productos</p>
@@ -225,13 +289,13 @@ const ListaProductos = () => {
 
               {selectedRows.selectedCount === 1 ? (
                 <>
-                <Link
-                  to={`../actualizar/${selectedRows.selectedRows[0]._id}`}
-                  className="transition duration-300 bg-blue-400 hover:bg-blue-500 
+                  <Link
+                    to={`../actualizar/${selectedRows.selectedRows[0]._id}`}
+                    className="transition duration-300 bg-blue-400 hover:bg-blue-500 
                 rounded-lg p-2 text-white"
-                >
-                  <FaPen size={15} />
-                </Link>
+                  >
+                    <FaPen size={15} />
+                  </Link>
                 </>
               ) : (
                 ""
@@ -249,13 +313,13 @@ const ListaProductos = () => {
               )}
             </div>
           </div>
-          <div className="w-[720px] h-[500px] overflow-y-scroll ">
+          <div className="min-h-[500px] w-[700px] bg-white rounded-xl">
             <DataTable
               data={records}
               columns={columns}
               defaultSortFieldId={4}
               fixedHeader={true}
-              fixedHeaderScrollHeight="600px"
+              fixedHeaderScrollHeight="700px"
               selectableRows={true}
               pagination={true}
               paginationRowsPerPageOptions={[3, 6, 8]} // Opciones de paginación personalizadas
@@ -268,20 +332,13 @@ const ListaProductos = () => {
               expandableRowsComponent={ExpandableRows}
               conditionalCellStyles={customCellStyles}
               noDataComponent={<NoDataComponent />}
-              conditionalRowStyles={[
-                {
-                  when: (rowData) => rowData.activo === true,
-                  style: {
-                    backgroundColor: "#e9ffea", // Color de fondo para filas activas
-                  },
-                },
-                {
-                  when: (rowData) => rowData.activo === false,
-                  style: {
-                    backgroundColor: "#ffc2c2", // Color de fondo para filas inactivas
-                  },
-                },
-              ]}
+              className="cursor-pointer"
+              highlightOnHover={true}
+              defaultSortAsc={false} // Orden descendente por defecto
+              expandableRowExpanded={(row) => row["codigo"] === expandedRow}
+              onRowClicked={handleRowClicked}
+              expandableRowsHideExpander={true}
+              loadingComponent={LoadingData}
             />
           </div>
         </section>

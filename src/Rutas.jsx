@@ -91,7 +91,7 @@ const Rutas = () => {
                 path="/modulo-perfil/*"
                 element={<PathModulos modulo={"perfil"} />}
               >
-                <Route path="perfil" element={<Perfil />} />
+                <Route path="lista" element={<Perfil />} />
               </Route>
             </Route>
           </Routes>
