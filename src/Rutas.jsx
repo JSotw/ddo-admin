@@ -26,9 +26,10 @@ import ActualizarProducto from "./page/productos/actualizar-producto.jsx";
 
 //Páginas de pedidos
 import CrearPedidos from "./page/pedidos/crear-pedido.jsx";
-// 
+//
 import "./App.css";
 import ActualizarUsuario from "./page/usuarios/actualizar-usuario.jsx";
+import ListaPedidos from "./page/pedidos/lista-pedidos.jsx";
 
 const Rutas = () => {
   return (
@@ -41,7 +42,17 @@ const Rutas = () => {
             <Route path="/" element={<Login />}></Route>
             <Route path="/recuperar-cuenta" element={<RecuperarCuenta />} />
           </Routes>
-
+          {/* Rutas del perfil de usuario */}
+          <Routes>
+            <Route element={<RutaProtegida />}>
+              <Route
+                path="/modulo-perfil/*"
+                element={<PathModulos modulo={"perfil"} />}
+              >
+                <Route path="lista" element={<Perfil />} />
+              </Route>
+            </Route>
+          </Routes>
           {/* Rutas de control*/}
           <ReportProvider>
             <Routes>
@@ -84,7 +95,10 @@ const Rutas = () => {
                   {/* Rutas anidadas */}
                   <Route path="lista" element={<ListaProductos />} />
                   <Route path="crear" element={<CrearProducto />} />
-                  <Route path="actualizar/:id" element={<ActualizarProducto />} />
+                  <Route
+                    path="actualizar/:id"
+                    element={<ActualizarProducto />}
+                  />
                 </Route>
               </Route>
             </Routes>
@@ -98,8 +112,8 @@ const Rutas = () => {
                   element={<PathModulos modulo={"pedidos"} />}
                 >
                   {/* Rutas anidadas */}
+                  <Route path="lista" element={<ListaPedidos />} />
                   <Route path="crear" element={<CrearPedidos />} />
-                  <Route path="lista" element={<CrearPedidos />} />
                 </Route>
               </Route>
             </Routes>

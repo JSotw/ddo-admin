@@ -7,7 +7,7 @@ const ListPedidosActivos = ({pedidos, pedidoActivo, setPedido}) => {
     <div className="flex flex-col gap-2 shadow w-auto p-4 rounded">
         {
             pedidos?.map(item =>(
-                <div onClick={() => setPedido(item)} className={item._id === pedidoActivo? "bg-green-500" : ""}>
+                <div key={item._id} onClick={() => setPedido(item)} className={item._id === pedidoActivo? "bg-green-500" : ""}>
                     <button><FaRegArrowAltCircleLeft /></button>
                     <label>{item.nombre_retiro}</label>
                 </div>

@@ -1,5 +1,10 @@
 import Sidebar, { SidebarItem } from "./body/Sidebar.jsx";
-import { FaHamburger, FaUser, FaChartPie  } from "react-icons/fa";
+import {
+  FaHamburger,
+  FaUser,
+  FaChartPie,
+  FaCalendarCheck,
+} from "react-icons/fa";
 import { useMediaQuery } from "react-responsive";
 
 import { useAuth } from "../context/AuthContext.jsx";
@@ -14,14 +19,15 @@ const items = [
   //   icon: <LuDollarSign size={20} />,
   //   name: "ventas",
   // },
+
   {
-    icon: <FaHamburger size={27} />,
-    name: "pedidos",
-    defaultRef: "crear",
+    icon: <FaChartPie size={27} />,
+    name: "control",
+    defaultRef: "lista",
   },
   {
-    icon: <FaChartPie  size={27} />,
-    name: "control",
+    icon: <FaCalendarCheck size={27} />,
+    name: "pedidos",
     defaultRef: "lista",
   },
   {
@@ -34,7 +40,6 @@ const items = [
     name: "usuarios",
     defaultRef: "lista",
   },
-  
 ];
 
 function AdminLayout({ children }) {
@@ -49,7 +54,9 @@ function AdminLayout({ children }) {
           <section className="flex h-full">
             <Sidebar
               nombre_usuario={user ? user.nombre_usuario : ""}
-              nombre_completo={user ? `${user.primer_n} ${user.apellido_p}` : ""}
+              nombre_completo={
+                user ? `${user.primer_n} ${user.apellido_p}` : ""
+              }
               imagen_perfil={user ? user.imagen_perfil : ""}
             >
               {items?.map((item, index = "lista") =>
