@@ -55,9 +55,9 @@ const CrearUsuario = () => {
     }
 
     const findUser = usuarios.find(
-      (user) => user.nombre_usuario === data.nombre_usuario
+      (user) => user.nombre_usuario === username
     );
-    console.log(findUser);
+    //console.log(findUser);
     if (findUser === undefined) {
       if (dataCorreo && dataCorreo.length && dataCorreo.match(isValidEmail)) {
         const usuarioData = {
@@ -66,8 +66,8 @@ const CrearUsuario = () => {
           apellido_p: data.apellido_p,
           apellido_m: data.apellido_m,
           correo: dataCorreo,
-          nombre_usuario: data.nombre_usuario,
-          contrasenia: data.contrasenia,
+          nombre_usuario: username,
+          contrasenia: username,
           imagen_perfil: data.imagen_perfil,
           rol: data.rol,
           activo: true,
@@ -75,7 +75,7 @@ const CrearUsuario = () => {
         openLoading();
         postUsuario(usuarioData);
         return navigate("/modulo-usuarios/lista", {
-          state: { toast: "success", usuario: data.nombre_usuario },
+          state: { toast: "success", usuario: username },
         });
       } else {
         errorCorreo.textContent = "Correo ingresado incorrecto";
@@ -100,7 +100,7 @@ const CrearUsuario = () => {
     document.getElementById("nombre_usuario").value = nombreUsuario;
     document.getElementById("contrasenia").value = nombreUsuario;
   };
-  console.log(username);
+  //console.log(username);
   function normalizarTexto(texto) {
     // Descomponer el texto para eliminar caracteres especiales
     return texto
@@ -236,7 +236,7 @@ const CrearUsuario = () => {
                   id="nombre_usuario"
                   disabled={true}
                   value={username}
-                  {...register("nombre_usuario", { required: true })}
+                  {...register("nombre_usuario")}
                   placeholder="1234Abc"
                 />
                 {errors.nombre_usuario && (
@@ -256,7 +256,7 @@ const CrearUsuario = () => {
                     py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="contrasenia"
                     type={showPassword ? "text" : "password"}
-                    {...register("contrasenia", { required: true })}
+                    {...register("contrasenia")}
                     placeholder="1234Abc"
                     disabled={true}
                     value={username}

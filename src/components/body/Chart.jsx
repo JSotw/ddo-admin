@@ -73,7 +73,7 @@ export default function Chart() {
           <BarChart
             width={500}
             height={300}
-            data={dataReportePorDia}
+            data={dataReportePorDia ? dataReportePorDia : "No hay datos"}
             margin={{
               top: 5,
               right: 30,
