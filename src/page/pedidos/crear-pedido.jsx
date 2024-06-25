@@ -283,11 +283,11 @@ const CrearPedido = () => {
               <div>
                 {
                     [...Array(mediosPago.length)].map((item, i) => (
-                      <div className="shadow w-auto p-5 rounded">
+                      <div key={i} className="shadow w-auto p-5 rounded">
                         <label>{mediosPago[i].nombre}</label>
                         <div>
                         {[...Array(mediosPago[i].camposExtra.length)].map((ce, ice) => (
-                          <div>
+                          <div key={ice}>
                             <label>{mediosPago[i].camposExtra[ice].nombre}</label>
                             <input className="appearance-none block w-full bg-gray-200 text-gray-700 border 
                             border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white 
@@ -317,7 +317,6 @@ const CrearPedido = () => {
           </div>
         </div>
       </section>
-      <style>{ }</style>
     </>
   );
 };
