@@ -94,8 +94,8 @@ const CrearPedido = () => {
   };
   
   const setPedido = async (pedido) => {
-    let _detalles = pedido.detalles;
-    _detalles.map(item =>{
+    let _detalles = await pedido.detalles;
+    await _detalles.map(item =>{
       item.producto.agregados.map(ag =>{
         let _busqueda = item.ingredientes.filter((i) => i.agregado.nombre === ag.nombre);
         if(_busqueda !== null && _busqueda !== undefined){
@@ -107,6 +107,7 @@ const CrearPedido = () => {
     setCountDetalles(_detalles.length);
     setPedidoId(pedido._id);
     setCliente(pedido.nombre_retiro);
+    setValue("nombre_cliente", pedido.nombre_retiro);
   };
 
   const savePedido = async () => {
@@ -119,7 +120,6 @@ const CrearPedido = () => {
   const onKeyDownValidate = async (e) => {
     if (e.key === "Enter") {
       const productoEncontrado = productos.filter((prod) => prod.codigo === e.target.value);
-      console.log(productoEncontrado);
       if (productoEncontrado.length === 1) {
         addPedidoItem(productoEncontrado[0]);
       } else {
@@ -134,13 +134,13 @@ const CrearPedido = () => {
   };
   const onValuePagoChange = async (e) => {
     if(e.target.value != ""){
-      console.log(e.target.value);
+      
     }
   };
   const submit = async (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     let nombre_retiro = document.getElementById(`nombre_cliente`).value;
-    if(nombre != ""){
+    if(nombre_retiro != ""){
       let _errors = {};
       let _errorsCount = 0;
         let _detalles = [];
@@ -167,28 +167,32 @@ const CrearPedido = () => {
         mediosPago.map((mp, i)=>{
           const montoPagado = document.getElementById(mp.nombre).value;
           if(montoPagado !== undefined && montoPagado !== null && montoPagado !== 0 && montoPagado !== ""){
-            console.log(montoPagado);
             let _pago = {
               tipo_pago:mp,
               monto: montoPagado
             };
+            let _errorPagos = 0;
             _pago.tipo_pago.camposExtra.map((tp, i)=>{
-              console.log(tp); 
-              console.log(tp.obligatorio); 
               const valueCampo = document.getElementById(tp.nombre).value;
               if((valueCampo === undefined || valueCampo === null || valueCampo === "") && tp.obligatorio){
-                console.log("error");
-                _errors[tp.nombre] = {required_error: `requerido`};
-                _errorsCount++;
+                _errorPagos++;
+              }else{
+                tp.valor = valueCampo;
               }
             });
+            if(_errorPagos == 0){
+              _pagos.push(_pago);
+            }else{
+              _errorsCount++;
+            }
           }
         });
-        if(_errorsCount === 0){
+      if(_errorsCount === 0){
           uploadDB({
             nombre_retiro: nombre_retiro,
             detalles: _detalles,
-            id_usuario: user.id
+            id_usuario: user.id,
+            pagos: _pagos
           });
       }else{
         setError(_errors);
@@ -226,7 +230,6 @@ const CrearPedido = () => {
                     id="nombre_cliente"
                     placeholder="Nombre Cliente"
                     onKeyDown={(e) => onKeyDownValidateCliente(e)}
-                    defaultValue={cliente}
                     {...register("nombre_cliente", { required: true })}
                   />
                   {errors.nombre_cliente && (
@@ -259,7 +262,7 @@ const CrearPedido = () => {
               </div>
               <div className="">
                 {
-                  [...Array(countDetalles)].map((item, i) => (
+                  [...Array(detalles.length)].map((item, i) => (
                     <PedidoItem key={i} detalle={detalles[i]} index={i} updateDetalle={savePedido}/>
                   ))
                 }
@@ -293,7 +296,7 @@ const CrearPedido = () => {
                             border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white 
                             focus:border-gray-500" type="text" 
                             id={mediosPago[i].camposExtra[ice].nombre}
-                            {...register(mediosPago[i].camposExtra[ice].nombre, { required: mediosPago[i].camposExtra[ice].obligatorio })}/>
+                            {...register(mediosPago[i].camposExtra[ice].nombre, { required: (mediosPago[i].camposExtra[ice].obligatorio && (mediosPago[i].monto !== undefined && mediosPago[i].monto >= 0 )) })}/>
                             {errors[mediosPago[i].camposExtra[ice].nombre] && (
                               <p className="text-red-500 mt-0 text-xs flex">
                                 Se requiere {mediosPago[i].camposExtra[ice].nombre}
