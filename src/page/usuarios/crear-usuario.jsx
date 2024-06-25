@@ -117,6 +117,7 @@ const CrearUsuario = () => {
             className="w-full max-w-lg text-sm"
             onSubmit={onSubmit}
             method="post"
+            id="form-usuarios"
           >
             <div className="flex flex-wrap -mx-3 mb-4">
               <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -345,17 +346,9 @@ const CrearUsuario = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              className=" bg-purple-300 hover:bg-purple-400 text-gray-800 font-semibold text-sm py-2 
-              px-4 rounded inline-flex items-center justify-center gap-2 transition-all w-full"
-            >
-              <span>Agregar</span>
-            </button>
           </form>
         </div>
       </section>
-      <style>{}</style>
     </>
   );
 };

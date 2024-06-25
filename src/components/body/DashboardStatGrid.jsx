@@ -10,7 +10,7 @@ export default function DashboardStatsGrid() {
 
   return (
     <div className="flex flex-wrap gap-2 justify-center">
-      <div className="flex flex-wrap gap-2 justify-center items-center rounded-xl shadow-md">
+      <div className="flex flex-wrap gap-2 justify-center items-center rounded-xl shadow-md shadow-gray-100">
         <BoxWrapper>
           <div className="rounded-full h-12 w-12 flex items-center justify-center bg-sky-500">
             <IoBagHandle className="text-2xl text-white" />
@@ -38,7 +38,7 @@ export default function DashboardStatsGrid() {
           </div>
         </BoxWrapper>
       </div>
-      <div className="flex flex-wrap gap-2 justify-center items-center rounded-xl shadow-md">
+      <div className="flex flex-wrap gap-2 justify-center items-center rounded-xl shadow-md shadow-gray-100">
         <BoxWrapper>
           <div className="rounded-full h-12 w-12 flex items-center justify-center bg-orange-600">
             <IoPieChart className="text-2xl text-white" />
@@ -71,7 +71,7 @@ export default function DashboardStatsGrid() {
           </div>
         </BoxWrapper>
       </div>
-      <div className="flex flex-wrap gap-2 justify-center items-center rounded-xl shadow-md">
+      <div className="flex flex-wrap gap-2 justify-center items-center rounded-xl shadow-md shadow-gray-100">
         <BoxWrapper>
           <div className="rounded-full h-12 w-12 flex items-center justify-center bg-yellow-400">
             <IoPeople className="text-2xl text-white" />
@@ -105,7 +105,7 @@ export default function DashboardStatsGrid() {
           </div>
         </BoxWrapper>
       </div>
-      <div className="flex flex-wrap gap-2 justify-center items-center rounded-xl shadow-md">
+      <div className="flex flex-wrap gap-2 justify-center items-center rounded-xl shadow-md shadow-gray-100">
         <BoxWrapper>
           <div className="rounded-full h-12 w-12 flex items-center justify-center bg-green-600">
             <IoCart className="text-2xl text-white" />

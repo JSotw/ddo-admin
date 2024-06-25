@@ -286,9 +286,9 @@ const ListaUsuarios = () => {
               )}
             </div>
           </div>
-          <div className="min-h-[500px] w-[700px] bg-white  rounded-xl">
+          <div className="min-h-[450px] w-[700px] bg-white  rounded-xl">
             <DataTable
-              className="cursor-pointer"
+              className="cursor-pointer h-[450px] w-full rounded-xl"
               highlightOnHover={true}
               data={records}
               columns={columns}

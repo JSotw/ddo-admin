@@ -23,7 +23,7 @@ export default function Chart() {
   }, []);
 
   return (
-    <div className="h-[22rem] bg-white p-4 rounded-xl shadow-md border border-gray-200 flex flex-col flex-1">
+    <div className="h-[22rem] bg-white p-4 rounded-xl shadow-md shadow-gray-100 border border-gray-200 flex flex-col flex-1">
       <strong className="text-gray-700 font-medium text-center">Transacciones</strong>
       <div className="mt-3 w-full flex-1 text-xs">
         <ResponsiveContainer width="100%" height="100%">

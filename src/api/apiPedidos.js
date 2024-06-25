@@ -6,6 +6,7 @@ export const obtenerPedidos = (desde, hasta, estado = null) => {
     else
         return axios.get(`/obtener-pedidos/${desde}/${hasta}?estado=${estado}`);
 }
+export const obtenerAllPedidos = () => axios.get(`/obtener-todos-pedidos`);
 export const obtenerPedido = (id) => axios.get(`/obtener-pedido/${id}`);
 
 export const crearPedido = (pedido) => axios.post(`/crear-pedido`, pedido);

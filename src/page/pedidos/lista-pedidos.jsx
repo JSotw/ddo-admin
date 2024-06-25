@@ -1,26 +1,55 @@
-/* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import {
+  FaAngleRight,
+  FaClipboard,
+  FaClipboardCheck,
+  FaClipboardList,
+  FaPen,
+  FaPlus,
+  FaSearch,
+  FaTrash,
+} from "react-icons/fa";
+import CardPedidos from "../../components/cards/CardPedidos";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useProductos } from "../../context/ProductosContext.jsx";
-import { FaPen, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
-import { toast, Bounce, ToastContainer } from "react-toastify";
-import { FaAngleRight } from "react-icons/fa";
-
+import { openSuccess } from "../../components/toast/OpenType";
+import { usePedidos } from "../../context/PedidosContext";
+import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 
-import { openSuccess } from "../../components/toast/OpenType.jsx";
+const menuList = [
+  {
+    icon: <FaClipboardCheck size={23} />,
+    text: "Diarios Terminados",
+    color: "#CFFFD4",
+  },
+  {
+    icon: <FaClipboardList size={23} />,
+    text: "Diarios en Proceso",
+    color: "#CFE3FF",
+  },
+  {
+    icon: <FaClipboard size={23} />,
+    text: "Crear Nuevo",
+    href: "../crear",
+    color: "#EBD8FF",
+  },
+];
 
-const ListaProductos = () => {
+const ListaPedidos = () => {
   const {
-    getProductos,
-    loading,
-    productos,
-    setRecords,
+    pedidos,
+    usuarios,
+    allPedidos,
+    allRecords,
     records,
-    deleteProducto,
-  } = useProductos();
+    loading,
+    setRecords,
+    getPedidos,
+    getUsuarios,
+    getAllPedidos,
+    deletePedido,
+  } = usePedidos();
   const navigate = useNavigate();
-
   const location = useLocation();
   const estado = location.state;
   const [selectedRows, setSelectedRows] = useState([]);
@@ -28,8 +57,8 @@ const ListaProductos = () => {
   const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
-    getProductos();
-
+    getAllPedidos();
+    getUsuarios();
     if (estado) {
       if (estado.toast === "success") {
         openSuccess("producto", estado.producto);
@@ -80,7 +109,7 @@ const ListaProductos = () => {
   function productoDelete(id) {
     //console.log(id);
     for (let i = 0; i < id.length; i++) {
-      deleteProducto(id[i]);
+      deletePedido(id[i]);
     }
     window.location.reload();
   }
@@ -101,7 +130,7 @@ const ListaProductos = () => {
 
   //console.log(!usuarios);
 
-  if (!productos) {
+  if (!pedidos) {
     return (
       <div className="px-4 py-1 bg-red-200 rounded-lg w-auto text-sm">
         No hay datos
@@ -126,44 +155,41 @@ const ListaProductos = () => {
 
   const conditionalCellStyles = [
     {
-      when: (row) => row["activo"] === true,
+      when: (row) => row.estado.nombre === "Terminado",
       style: {
         backgroundColor: "#CFFFD4",
       },
     },
     {
-      when: (row) => row["activo"] === false,
+      when: (row) => row.estado.nombre === "En Proceso",
       style: {
-        backgroundColor: "#FFCFEC",
+        backgroundColor: "#CFE3FF",
       },
     },
   ];
 
   const columns = [
     {
-      name: "Codigo",
-      selector: (row) => `${row.codigo}`,
+      name: "Usuario",
+      selector: (row) =>
+        usuarios?.find((usuario) => usuario._id === row.id_usuario)
+          ?.nombre_usuario,
       sortable: true,
       width: "100px",
     },
     {
-      name: "Nombre",
-      selector: (row) => row.nombre,
+      name: "Nombre Retiro",
+      selector: (row) => row.nombre_retiro,
       width: "170px",
     },
     {
-      name: "Descripción",
-      selector: (row) => row.descripcion,
-      width: "140px",
-    },
-    {
-      name: "Precio Base",
-      selector: (row) => `$ ${row.precio_base}`,
+      name: "Precio Total",
+      selector: (row) => `$ ${row.monto_total}`,
       width: "100px",
     },
     {
       name: "Estado",
-      selector: (row) => `${row.activo ? "Activo" : "Inactivo"}`,
+      selector: (row) => row.estado.nombre,
       sortable: true,
       conditionalCellStyles,
       width: "100px",
@@ -180,17 +206,8 @@ const ListaProductos = () => {
       },
     },
   ];
-
-  // const elements = document.querySelectorAll(".rdt_TableCell");
-  // elements.forEach((element) => {
-  //   const innerDiv = element.querySelector('div[data-tag="allowRowEvents"]');
-  //   if (innerDiv && innerDiv.textContent.trim().toLowerCase() === "activo") {
-  //     innerDiv.classList.add("text-white", "bg-green-300", "rounded-lg", "px-2", "py-1");
-  //   }
-  // });
-
   const searchChange = (e) => {
-    const filteredRecords = productos.filter((record) => {
+    const filteredRecords = pedidos.filter((record) => {
       return record.nombre.toLowerCase().includes(e.target.value.toLowerCase());
     });
     setRecords(filteredRecords);
@@ -198,34 +215,16 @@ const ListaProductos = () => {
   };
 
   const ExpandableRows = ({ data }) => {
-    let product = JSON.stringify(data);
-    let productData = JSON.parse(product);
+    let order = JSON.stringify(data);
+    let orderData = JSON.parse(order);
     return (
       <section
         className="animate-duration-300 bg-white z-30 shadow-sm animate-flip-down 
         rounded-b-lg z-4 w-full h-auto text-sm"
       >
         <div className=" rounded-lg flex items-center gap-2 p-1 text-black">
-          {productData.agregados.map((a) => (
-            <article
-              key={a.nombre}
-              className={`text-black text-[11px] bg-gray-50 shadow-md flex items-center gap-2 
-                  px-3 py-2 rounded-lg `}
-            >
-              {a.precio > 0 ? (
-                <div className="flex flex-col">
-                  <p className="text-black -mb-1"> {a.nombre}</p>
-                  <p className="text-green-500">$ {a.precio}</p>
-                </div>
-              ) : (
-                ``
-              )}
-            </article>
-          ))}
-          <FaAngleRight />
-          <p className="font-semibold text-[11px] text-wrap">
-            {productData.descripcion}
-          </p>
+          <FaAngleRight size={15} />
+          <p className="font-semibold text-[11px] text-wrap"></p>
         </div>
       </section>
     );
@@ -257,19 +256,31 @@ const ListaProductos = () => {
       setExpandedRow(row["codigo"]);
     }
   };
-
-  if (productos) {
-    return (
-      <main>
+  return (
+    <>
+      <main className="">
+        <section className="py-2 flex gap-4 flex-wrap flex-col justify-between md:flex-row">
+          {menuList?.map((item, index) => (
+            <section key={index} className="">
+              <CardPedidos
+                key={index}
+                icon={item.icon}
+                text={item.text}
+                href={item.href}
+                color={item.color}
+              />
+            </section>
+          ))}
+        </section>
         <section className="flex flex-col gap-0 shadow-md rounded-xl w-auto">
           <ToastContainer />
           <div className="flex m-full gap-2 px-4 justify-between items-center py-2 bg-amber-100 text-sm rounded-t-2xl">
-            <p className="font-semibold text-amber-900">Lista de Productos</p>
+            <p className="font-semibold text-amber-900">Lista de Pedidos</p>
             <div className="flex gap-2">
               <div className="flex gap-2 relative">
                 <input
                   className="appearance-none block w-full bg-amber-50 text-gray-700
-                  rounded leading-tight focus:outline-none focus:bg-white px-2"
+                  rounded leading-tight focus:outline-none py-2 focus:bg-white px-2"
                   placeholder="Buscar productos"
                   type="text"
                   id="search"
@@ -277,13 +288,13 @@ const ListaProductos = () => {
                 />
                 <FaSearch className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               </div>
-              <Link
+              {/* <Link
                 className="transition duration-300 items-center flex bg-purple-400 hover:bg-purple-500 
               rounded-lg p-2 text-white"
                 to={`../crear`}
               >
                 <FaPlus size={15} />
-              </Link>
+              </Link> */}
               {/* Si está seleccionado 1 usuario se podrá editar y eliminar, 
                   si se seleccionan varios se podrá eliminar. */}
 
@@ -313,18 +324,18 @@ const ListaProductos = () => {
               )}
             </div>
           </div>
-          <div className="relative min-h-[450px] w-[700px] bg-white rounded-xl overflow-y-auto">
+          <div className="min-h-[400px] w-[700px] bg-white rounded-xl">
             <DataTable
-              className="cursor-pointer h-[450px] w-full rounded-xl"
-              data={records}
+              className="cursor-pointer h-[400px] w-full rounded-xl"
+              data={allRecords}
               columns={columns}
               defaultSortFieldId={1}
               fixedHeader={true}
               fixedHeaderScrollHeight="700px"
               selectableRows={true}
               pagination={true}
-              paginationRowsPerPageOptions={[3, 6, 8]} // Opciones de paginación personalizadas
-              paginationPerPage={8}
+              paginationRowsPerPageOptions={[3, 7]} // Opciones de paginación personalizadas
+              paginationPerPage={7}
               paginationComponentOptions={paginationOptions}
               onSelectedRowsChange={(row) => setSelectedRows(row)}
               progressPending={loading}
@@ -343,8 +354,8 @@ const ListaProductos = () => {
           </div>
         </section>
       </main>
-    );
-  }
+    </>
+  );
 };
 
-export default ListaProductos;
+export default ListaPedidos;

@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { actualizarPedido, crearPedido, obtenerPedidos, obtenerPedido, eliminarPedido } from "../api/apiPedidos";
+import { actualizarPedido, crearPedido, obtenerPedidos, obtenerPedido, eliminarPedido, obtenerAllPedidos } from "../api/apiPedidos";
 import { obtenerProductos, obtenerProducto, obtenerProductoCodigo } from "../api/apiProductos";
 import { obtenerMediosPago } from "../api/apiPagos";
+import { obtenerUsuarios } from "../api/apiUsuarios";
 
 
 const PedidosContext = createContext();
@@ -18,6 +19,9 @@ export const usePedidos = () => {
 
 export function PedidosProvider({ children }) {
   const [pedidos, setPedidos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [allPedidos, setAllPedidos] = useState([]);
+  const [allRecords, setAllRecords] = useState([]);
   const [productos, setProductos] = useState([]);
   const [recordsProductos, setRecordsProductos] = useState([]);
   const [records, setRecords] = useState([]);
@@ -40,6 +44,18 @@ export function PedidosProvider({ children }) {
     }
   }, [errors]);
 
+  const getAllPedidos = async () => {
+    try {
+      const res = await obtenerAllPedidos();
+      setLoading(false);
+      console.log(res.data);
+      setAllPedidos(res.data);
+      setAllRecords(res.data);
+    } catch (error) {
+      setLoading(true);
+      console.error(error);
+    }
+  };
   const getPedidos = async (desde, hasta, estado) => {
     try {
       const res = await obtenerPedidos(desde, hasta, estado);
@@ -80,8 +96,6 @@ export function PedidosProvider({ children }) {
         setPedidoId(res.data._id);
         console.log("creado");
         console.log(res.data);
-      }else{
-
       }
       return res;
     } catch (error) {
@@ -139,13 +153,25 @@ export function PedidosProvider({ children }) {
       return error;
     }
   };
+  const getUsuarios = async () => {
+    try {
+      const res = await obtenerUsuarios();
+      setLoading(false);
+      setUsuarios(res.data);
+    } catch (error) {
+      setLoading(true);
+      console.error(error);
+    }
+  };
 
   return (
     <PedidosContext.Provider
       value={{
+        allPedidos,
         pedidos,
         loading,
         records,
+        allRecords,
         productos,
         recordsProductos,
         pedidoId,
@@ -153,7 +179,8 @@ export function PedidosProvider({ children }) {
         countDetalles,
         cliente,
         mediosPago,
-
+        usuarios,
+        
         setRecords,
         setDetalles,
         setCountDetalles,
@@ -169,6 +196,8 @@ export function PedidosProvider({ children }) {
         getProducto,
         getProductoCodigo,
         getMediosPago,
+        getAllPedidos,
+        getUsuarios,
       }}
     >
       {children}
