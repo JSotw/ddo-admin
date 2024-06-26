@@ -16,7 +16,6 @@ const PedidoItem = ({detalle, index, updateDetalle}) => {
   useEffect(() => {
     let _agregadosTotal = 0;
     const cantidad = detalle.cantidad;
-    console.log(detalle);
     detalle.producto.agregados?.map(item =>{
         if(item.cantidad !== undefined && item.cantidad !== null){
             _agregadosTotal += item.cantidad*item.precio;
@@ -24,7 +23,6 @@ const PedidoItem = ({detalle, index, updateDetalle}) => {
             _agregadosTotal += item.minimo_selec*item.precio;
         }
     })
-    console.log(_agregadosTotal);
     setTotal(((_agregadosTotal + producto.precio_base) * cantidad))
     let updatedDetalle = detalle;
     updatedDetalle.cantidad = cantidad;
