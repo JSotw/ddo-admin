@@ -1,11 +1,16 @@
 import {
+  FaAngleDoubleRight,
+  FaAngleDown,
   FaAngleRight,
+  FaCalendarCheck,
   FaClipboard,
   FaClipboardCheck,
   FaClipboardList,
   FaPen,
   FaPlus,
   FaSearch,
+  FaStop,
+  FaStopCircle,
   FaTrash,
 } from "react-icons/fa";
 import CardPedidos from "../../components/cards/CardPedidos";
@@ -15,6 +20,8 @@ import { openSuccess } from "../../components/toast/OpenType";
 import { usePedidos } from "../../context/PedidosContext";
 import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
+import { format } from "date-fns";
+import { TbBowlChopsticksFilled, TbCalendarCancel, TbCalendarCheck, TbSquareRoundedCheckFilled, TbSquareRoundedXFilled } from "react-icons/tb";
 
 const menuList = [
   {
@@ -75,10 +82,10 @@ const ListaPedidos = () => {
   }, []);
 
   const ToastDelete = ({ selectedRecords }) => {
-    let selectedProduct = [];
+    let selectedOrder = [];
     let selectedId = [];
     for (let i = 0; i < selectedRecords.length; i++) {
-      selectedProduct.push(
+      selectedOrder.push(
         selectedRecords[i].codigo + "-" + selectedRecords[i].nombre
       );
       selectedId.push(selectedRecords[i]._id);
@@ -86,7 +93,7 @@ const ListaPedidos = () => {
     return (
       <div className="px-4 py-2">
         <p>Seguro de eliminar el producto:</p>
-        {selectedProduct?.map((producto, index) => (
+        {selectedOrder?.map((producto, index) => (
           <div key={index}>
             <p className="text-red-400">{producto}</p>
           </div>
@@ -180,7 +187,7 @@ const ListaPedidos = () => {
     {
       name: "Nombre Retiro",
       selector: (row) => row.nombre_retiro,
-      width: "170px",
+      width: "130px",
     },
     {
       name: "Precio Total",
@@ -189,13 +196,38 @@ const ListaPedidos = () => {
     },
     {
       name: "Estado",
-      selector: (row) => row.estado.nombre,
+      selector: (row) => (
+        row.estado.nombre === "Terminado"
+          ? <span className="flex item-center gap-2 p-1">{row.estado.nombre}<TbSquareRoundedXFilled className="" size={17} /></span>
+          : <span className="flex item-center gap-2 p-1">{row.estado.nombre}<TbBowlChopsticksFilled className="animate-bounce" size={17} /></span>
+      ),
       sortable: true,
       conditionalCellStyles,
-      width: "100px",
+      width: "130px",
       style: {
         color: "black",
         fontWeight: "bold",
+        fontSize: "12px",
+        margin: "10px",
+        width: "100%",
+        display: "flex",
+        borderRadius: "15px",
+        justifyContent: "center",
+        textTransform: "capitalize",
+      },
+    },
+    {
+      name: "Fecha y hora",
+      selector: (row) =>
+        row.estado.nombre === "Terminado"
+          ? format(new Date(row["updatedAt"]), "dd/MM/yyyy")
+          : format(new Date(row["createdAt"]), "dd/MM/yyyy"),
+      sortable: true,
+      conditionalCellStyles,
+      width: "140px",
+      style: {
+        color: "black",
+        fontWeight: "600",
         fontSize: "12px",
         margin: "10px",
         width: "100%",
@@ -217,15 +249,63 @@ const ListaPedidos = () => {
   const ExpandableRows = ({ data }) => {
     let order = JSON.stringify(data);
     let orderData = JSON.parse(order);
+    let orderEstado = orderData.estado.nombre;
+    let orderDetails = orderData.detalles;
     return (
       <section
         className="animate-duration-300 bg-white z-30 shadow-sm animate-flip-down 
         rounded-b-lg z-4 w-full h-auto text-sm"
       >
-        <div className=" rounded-lg flex items-center gap-2 p-1 text-black">
-          <FaAngleRight size={15} />
-          <p className="font-semibold text-[11px] text-wrap"></p>
-        </div>
+        {orderDetails.map((item, index) => (
+          <article
+            key={index}
+            className={`text-black text-[11px] bg-gray-50 shadow-md flex items-center gap-2 
+                  px-3 py-2 rounded-lg `}
+          >
+            {item.producto.agregados.map((a) => (
+              <div
+                key={a.nombre}
+                className={`text-black text-[11px] bg-gray-50 shadow-md flex items-center gap-2 
+                      px-3 py-2 rounded-lg `}
+              >
+                {a.precio > 0 ? (
+                  <div className="flex flex-col">
+                    <p className="text-black -mb-1"> {a.nombre}</p>
+                    <p className="text-green-500">$ {a.precio}</p>
+                  </div>
+                ) : (
+                  ``
+                )}
+              </div>
+            ))}
+            <FaAngleRight />
+            <p className="font-semibold text-[11px] text-wrap">
+              {item.producto.descripcion}
+            </p>
+            <FaAngleDoubleRight size={15} className="ml-4" />
+            {orderEstado === "En Proceso" ? (
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => terminarPedido(data._id)}
+                  className="bg-green-200 shadow-xl hover:scale-105 duration-200 transition 
+                  shadow-gray-100 rounded-xl text-black text-xs font-semibold px-5 py-3 flex item-center gap-2">
+                  Terminar 
+                  <TbCalendarCheck size={20} />
+                </button>
+                <button 
+                  onClick={() => cancelarPedido(data._id)}
+                  className="bg-red-200 shadow-xl hover:scale-105 duration-200 transition 
+                  shadow-gray-100 rounded-xl text-black text-xs font-semibold px-5 py-3 flex item-center gap-2">
+                  Cancelar  
+                  <TbCalendarCancel size={20} />
+                </button>
+              </div>
+              
+            ) : (
+              ""
+            )}
+          </article>
+        ))}
       </section>
     );
   };
@@ -248,12 +328,12 @@ const ListaPedidos = () => {
   ];
 
   const handleRowClicked = (row) => {
-    if (expandedRow === row["codigo"]) {
+    if (expandedRow === row["_id"]) {
       // Si la fila actualmente expandida se hace clic de nuevo, cierra la expansión
       setExpandedRow(null);
     } else {
       // Si se hace clic en una nueva fila expandible, expande esa fila y cierra cualquier otra fila expandida
-      setExpandedRow(row["codigo"]);
+      setExpandedRow(row["_id"]);
     }
   };
   return (
@@ -346,7 +426,7 @@ const ListaPedidos = () => {
               noDataComponent={<NoDataComponent />}
               highlightOnHover={true}
               defaultSortAsc={true} // Orden descendente por defecto
-              expandableRowExpanded={(row) => row["codigo"] === expandedRow}
+              expandableRowExpanded={(row) => row["_id"] === expandedRow}
               onRowClicked={handleRowClicked}
               expandableRowsHideExpander={true}
               loadingComponent={LoadingData}
