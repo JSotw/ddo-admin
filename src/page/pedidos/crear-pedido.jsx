@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { usePedidos } from "../../context/PedidosContext.jsx";
 import PedidoItem from "../../components/body/PedidoItem.jsx";
+import ListItemsPedido from "../../components/body/ListItemsPedido.jsx";
 import ListPedidosActivos from "../../components/body/ListPedidosActivos.jsx";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -11,12 +12,13 @@ const CrearPedido = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setValue,
+    handleClick
   } = useForm();
   const formRef = useRef(null);
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const [error, setError] = useState([]);
+  const [errors, setErrors] = useState([]);
+  const [estado, setEstado] = useState("");
   const {
     pedidos,
     loading,
@@ -47,24 +49,22 @@ const CrearPedido = () => {
   } = usePedidos();
 
   useEffect(() => {
+    let desde = new Date(); 
+    let hasta = new Date();
+    desde.setHours(0, 0, 0, 0);
+    hasta.setHours(23, 59, 59, 999);
+    getPedidos(desde, hasta, 1)
     setDetalles([]);
     setCountDetalles(0);
     setCliente("");
     getProductos();
     getMediosPago();
-
-    let desde= new Date(); 
-    let hasta= new Date();
-
-    desde.setHours(0, 0, 0, 0);
-    hasta.setHours(23, 59, 59, 999);
-    getPedidos(desde, hasta, 1)
   }, []);
 
   const addPedidoItem = async (producto) => {
     try {
       let _agregados = [];
-      producto.agregados?.map(ag =>{
+      producto.agregados?.map(ag => {
         _agregados.push({
           nombre: ag.nombre,
           cantidad: ag.minimo_selec
@@ -77,28 +77,46 @@ const CrearPedido = () => {
         agregados: _agregados
       }
       let _dets = detalles;
-      _dets.push(newDetalle)
+      detalles.push(newDetalle);
       setDetalles(_dets);
       setCountDetalles(_dets.length);
-      savePedido();
+      await savePedido("");
     } catch (error) {
       return error;
     }
   };
+  const handleFinalizarPedido = () => {
+    finalizarPedido();
+  };
+  const finalizarPedido = async () => {
+    await savePedido("Terminado");
+    let desde = new Date(); 
+    let hasta = new Date();
+    desde.setHours(0, 0, 0, 0);
+    hasta.setHours(23, 59, 59, 999);
+    getPedidos(desde, hasta, 1)
+    setDetalles([]);
+    setCountDetalles(0);
+    setCliente("");
+    getProductos();
+    getMediosPago();
+    setPedidoId("");
+  };
+
   const uploadDB = async (data) => {
-    if(pedidoId == ""){
-      postPedido(data);
-    }else{
-      putPedido(pedidoId, data);
+    if (pedidoId === "") {
+      await postPedido(data);
+    } else {
+      await putPedido(pedidoId, data);
     }
   };
-  
+
   const setPedido = async (pedido) => {
     let _detalles = await pedido.detalles;
-    await _detalles.map(item =>{
-      item.producto.agregados.map(ag =>{
+    await _detalles.map(item => {
+      item.producto.agregados.map(ag => {
         let _busqueda = item.ingredientes.filter((i) => i.agregado.nombre === ag.nombre);
-        if(_busqueda !== null && _busqueda !== undefined){
+        if (_busqueda !== null && _busqueda !== undefined) {
           ag.cantidad = _busqueda[0].cantidad;
         }
       })
@@ -110,95 +128,105 @@ const CrearPedido = () => {
     setValue("nombre_cliente", pedido.nombre_retiro);
   };
 
-  const savePedido = async () => {
+  const savePedido = async (estado) => {
+    await setEstado(estado);
     if (formRef.current) {
       formRef.current.dispatchEvent(
-          new Event('submit', { bubbles: true, cancelable: true })
+        new Event('submit', { bubbles: true, cancelable: true })
       );
     }
   };
+
   const onKeyDownValidate = async (e) => {
     if (e.key === "Enter") {
       const productoEncontrado = productos.filter((prod) => prod.codigo === e.target.value);
       if (productoEncontrado.length === 1) {
         addPedidoItem(productoEncontrado[0]);
-      } else {
-
       }
     }
   };
+
   const onKeyDownValidateCliente = async (e) => {
-    if(e.target.value != ""){
+    if (e.target.value !== "") {
       setCliente(e.target.value);
     }
   };
+
   const onValuePagoChange = async (e) => {
-    if(e.target.value != ""){
+    if (e.target.value !== "") {
       
     }
   };
-  const submit = async (e) => {
-    //e.preventDefault();
-    let nombre_retiro = document.getElementById(`nombre_cliente`).value;
-    if(nombre_retiro != ""){
+
+
+  const submit = async (data) => {
+    let nombre_retiro = document.getElementById("nombre_cliente").value;
+    if (nombre_retiro !== "") {
       let _errors = {};
       let _errorsCount = 0;
-        let _detalles = [];
-        let _pagos = [];
-        detalles.map((detalle, i) => {
-          let _det = detalle;
-          _det.agregados = [];
-          detalle.producto.agregados?.map(item =>{
-            let _ag = {
-                nombre: item.nombre,
-                cantidad: 0
-            };
-            const itemId = `${i}_${item.nombre}`;
-            try{
-              const cantidadAg = document.getElementById(itemId).value;
-              if(cantidadAg !== undefined && cantidadAg !== 0){
-                _ag.cantidad = cantidadAg;
-                _det.agregados.push(_ag);
-              }
-            }catch(err){}
-          })
-          _detalles.push(_det);
-        });
-        mediosPago.map((mp, i)=>{
-          const montoPagado = document.getElementById(mp.nombre).value;
-          if(montoPagado !== undefined && montoPagado !== null && montoPagado !== 0 && montoPagado !== ""){
-            let _pago = {
-              tipo_pago:mp,
-              monto: montoPagado
-            };
-            let _errorPagos = 0;
-            _pago.tipo_pago.camposExtra.map((tp, i)=>{
-              const valueCampo = document.getElementById(tp.nombre).value;
-              if((valueCampo === undefined || valueCampo === null || valueCampo === "") && tp.obligatorio){
-                _errorPagos++;
-              }else{
-                tp.valor = valueCampo;
-              }
-            });
-            if(_errorPagos == 0){
-              _pagos.push(_pago);
-            }else{
-              _errorsCount++;
+      let _detalles = [];
+      let _pagos = [];
+      detalles.map((detalle, i) => {
+        let _det = detalle;
+        _det.agregados = [];
+        detalle.producto.agregados?.map(item => {
+          let _ag = {
+            nombre: item.nombre,
+            cantidad: 0
+          };
+          const itemId = `${i}_${item.nombre}`;
+          try {
+            const cantidadAg = document.getElementById(itemId).value;
+            if (cantidadAg !== undefined && cantidadAg !== 0) {
+              _ag.cantidad = cantidadAg;
+              _det.agregados.push(_ag);
             }
-          }
-        });
-      if(_errorsCount === 0){
-          uploadDB({
-            nombre_retiro: nombre_retiro,
-            detalles: _detalles,
-            id_usuario: user.id,
-            pagos: _pagos
+          } catch (err) {}
+        })
+        _detalles.push(_det);
+      });
+
+      mediosPago.map((mp, i) => {
+        const montoPagado = document.getElementById(mp.nombre).value;
+        if (montoPagado !== undefined && montoPagado !== null && montoPagado !== 0 && montoPagado !== "") {
+          let _pago = {
+            tipo_pago: mp,
+            monto: montoPagado
+          };
+          let _errorPagos = 0;
+          _pago.tipo_pago.camposExtra.map((tp, i) => {
+            const valueCampo = document.getElementById(tp.nombre).value;
+            if ((valueCampo === undefined || valueCampo === null || valueCampo === "") && tp.obligatorio) {
+              _errorPagos++;
+            } else {
+              tp.valor = valueCampo;
+            }
           });
-      }else{
-        setError(_errors);
+          if (_errorPagos === 0) {
+            _pagos.push(_pago);
+          } else {
+            _errorsCount++;
+          }
+        }
+      });
+
+      if (_errorsCount === 0) {
+        let objPedido = {
+          nombre_retiro: nombre_retiro,
+          detalles: _detalles,
+          id_usuario: user.id,
+          pagos: _pagos
+        }
+        if(estado !== ""){
+          objPedido.estado = estado;
+          setEstado("");
+        }
+        await uploadDB(objPedido);
+      } else {
+        setErrors(_errors);
       }
-    }else{
-      setError({nombre_cliente: true})
+    } else {
+      setErrors({ nombre_cliente: true });
     }
   };
 
@@ -260,14 +288,13 @@ const CrearPedido = () => {
                   )}
                 </div>
               </div>
-              <div className="">
-                {
-                  [...Array(detalles.length)].map((item, i) => (
-                    <PedidoItem key={i} detalle={detalles[i]} index={i} updateDetalle={savePedido}/>
-                  ))
-                }
-              </div>
+              <ListItemsPedido countDetalles={countDetalles} detalles={detalles} savePedido={savePedido}/>
             </form>
+              <div>
+                <button 
+                onClick={(e) => handleFinalizarPedido(e)}
+                className="mt-3 shadow-md bg-purple-400 hover:bg-purple-500 text-white   font-semibold py-2 text-sm px-4 rounded inline-flex items-center justify-center gap-2    transition-all w-auto">Finalizar</button>
+              </div>
           </div>
         </div>
         <div className="w-full md:w-1/4 px-3 md:mb-0">
@@ -276,7 +303,7 @@ const CrearPedido = () => {
                 Listado otros pedido abiertos
             </div>
             <div>
-              <ListPedidosActivos pedidos={pedidos} pedidoActivo={pedidoId} setPedido={setPedido}/>
+              <ListPedidosActivos pedidos={pedidos} pedidoActivo={pedidoId} setPedido={setPedido} eliminarPedido={deletePedido}/>
             </div>
             
           </div>
