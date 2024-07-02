@@ -73,7 +73,7 @@ function AdminLayout({ children }) {
                 )
               )}
             </Sidebar>
-            <section className="p-2 px-24">{children}</section>
+            <section className="p-2 px-10">{children}</section>
           </section>
         ) : (
           <section className="grid gap-6">
