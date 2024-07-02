@@ -55,6 +55,8 @@ const ListaPedidos = () => {
     getUsuarios,
     getAllPedidos,
     deletePedido,
+    putPedido,
+    putEstadoPedido,
   } = usePedidos();
   const navigate = useNavigate();
   const location = useLocation();
@@ -168,6 +170,12 @@ const ListaPedidos = () => {
       },
     },
     {
+      when: (row) => row.estado.nombre === "Cancelado",
+      style: {
+        backgroundColor: "#FECACA",
+      },
+    },
+    {
       when: (row) => row.estado.nombre === "En Proceso",
       style: {
         backgroundColor: "#CFE3FF",
@@ -197,10 +205,16 @@ const ListaPedidos = () => {
     {
       name: "Estado",
       selector: (row) => (
-        row.estado.nombre === "Terminado"
+        row.estado.nombre === "Cancelado"
           ? <span className="flex item-center gap-2 p-1">{row.estado.nombre}<TbSquareRoundedXFilled className="" size={17} /></span>
-          : <span className="flex item-center gap-2 p-1">{row.estado.nombre}<TbBowlChopsticksFilled className="animate-bounce" size={17} /></span>
-      ),
+          :
+        row.estado.nombre === "Terminado"
+          ? <span className="flex item-center gap-2 p-1 ">{row.estado.nombre}<TbSquareRoundedCheckFilled className="" size={17} /></span>
+          :
+        row.estado.nombre === "En Proceso"
+          ? <span className="flex item-center gap-2 p-1">{row.estado.nombre}<TbBowlChopsticksFilled className="animate-bounce" size={17} /></span>
+          : ""
+        ),
       sortable: true,
       conditionalCellStyles,
       width: "130px",
@@ -220,8 +234,8 @@ const ListaPedidos = () => {
       name: "Fecha y hora",
       selector: (row) =>
         row.estado.nombre === "Terminado"
-          ? format(new Date(row["updatedAt"]), "dd/MM/yyyy")
-          : format(new Date(row["createdAt"]), "dd/MM/yyyy"),
+          ? format(new Date(row["updatedAt"]), "dd/MM/yyyy hh:mm")
+          : format(new Date(row["createdAt"]), "dd/MM/yyyy hh:mm"),
       sortable: true,
       conditionalCellStyles,
       width: "140px",
@@ -244,6 +258,10 @@ const ListaPedidos = () => {
     });
     setRecords(filteredRecords);
     //console.log(records);
+  };
+  const updateEstadoPedido = (id, data) => {
+    putEstadoPedido(id, data);
+    window.location.reload();
   };
 
   const ExpandableRows = ({ data }) => {
@@ -286,14 +304,18 @@ const ListaPedidos = () => {
             {orderEstado === "En Proceso" ? (
               <div className="flex gap-2">
                 <button 
-                  onClick={() => terminarPedido(data._id)}
+                  onClick={() => updateEstadoPedido(data._id, {
+                    estado: "Terminado",
+                  })}
                   className="bg-green-200 shadow-xl hover:scale-105 duration-200 transition 
                   shadow-gray-100 rounded-xl text-black text-xs font-semibold px-5 py-3 flex item-center gap-2">
                   Terminar 
                   <TbCalendarCheck size={20} />
                 </button>
                 <button 
-                  onClick={() => cancelarPedido(data._id)}
+                  onClick={() => updateEstadoPedido(data._id, {
+                    estado: "Cancelado",
+                  })}
                   className="bg-red-200 shadow-xl hover:scale-105 duration-200 transition 
                   shadow-gray-100 rounded-xl text-black text-xs font-semibold px-5 py-3 flex item-center gap-2">
                   Cancelar  
@@ -378,19 +400,7 @@ const ListaPedidos = () => {
               {/* Si está seleccionado 1 usuario se podrá editar y eliminar, 
                   si se seleccionan varios se podrá eliminar. */}
 
-              {selectedRows.selectedCount === 1 ? (
-                <>
-                  <Link
-                    to={`../actualizar/${selectedRows.selectedRows[0]._id}`}
-                    className="transition duration-300 bg-blue-400 hover:bg-blue-500 
-                rounded-lg p-2 text-white"
-                  >
-                    <FaPen size={15} />
-                  </Link>
-                </>
-              ) : (
-                ""
-              )}
+              
               {selectedRows.selectedCount > 0 ? (
                 <button
                   className="transition duration-300 bg-red-400 hover:bg-red-500 
@@ -409,7 +419,7 @@ const ListaPedidos = () => {
               className="cursor-pointer h-[400px] w-full rounded-xl"
               data={allRecords}
               columns={columns}
-              defaultSortFieldId={1}
+              defaultSortFieldId={5}
               fixedHeader={true}
               fixedHeaderScrollHeight="700px"
               selectableRows={true}

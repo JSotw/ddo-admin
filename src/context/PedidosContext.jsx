@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { actualizarPedido, crearPedido, obtenerPedidos, obtenerPedido, eliminarPedido, obtenerAllPedidos } from "../api/apiPedidos";
+import { actualizarPedido, crearPedido, obtenerPedidos, obtenerPedido, eliminarPedido, obtenerAllPedidos, actualizarEstadoPedido } from "../api/apiPedidos";
 import { obtenerProductos, obtenerProducto, obtenerProductoCodigo } from "../api/apiProductos";
 import { obtenerMediosPago } from "../api/apiPagos";
 import { obtenerUsuarios } from "../api/apiUsuarios";
@@ -141,6 +141,16 @@ export function PedidosProvider({ children }) {
       return error;
     }
   };
+
+  const putEstadoPedido = async (id, data) => {
+    try {
+      const res = await actualizarEstadoPedido(id, data);
+      console.log(res.data); // Obtenemos el usuario actualizado
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const deletePedido = async (id) => {
     try {
       const res = await eliminarPedido(id);
@@ -198,6 +208,7 @@ export function PedidosProvider({ children }) {
         getMediosPago,
         getAllPedidos,
         getUsuarios,
+        putEstadoPedido,
       }}
     >
       {children}
