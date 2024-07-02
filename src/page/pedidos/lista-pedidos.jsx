@@ -24,16 +24,16 @@ import { format } from "date-fns";
 import { TbBowlChopsticksFilled, TbCalendarCancel, TbCalendarCheck, TbSquareRoundedCheckFilled, TbSquareRoundedXFilled } from "react-icons/tb";
 
 const menuList = [
-  {
-    icon: <FaClipboardCheck size={23} />,
-    text: "Diarios Terminados",
-    color: "#CFFFD4",
-  },
-  {
-    icon: <FaClipboardList size={23} />,
-    text: "Diarios en Proceso",
-    color: "#CFE3FF",
-  },
+  // {
+  //   icon: <FaClipboardCheck size={23} />,
+  //   text: "Diarios Terminados",
+  //   color: "#CFFFD4",
+  // },
+  // {
+  //   icon: <FaClipboardList size={23} />,
+  //   text: "Diarios en Proceso",
+  //   color: "#CFE3FF",
+  // },
   {
     icon: <FaClipboard size={23} />,
     text: "Crear Nuevo",
@@ -57,6 +57,7 @@ const ListaPedidos = () => {
     deletePedido,
     putPedido,
     putEstadoPedido,
+    setAllRecords,
   } = usePedidos();
   const navigate = useNavigate();
   const location = useLocation();
@@ -88,22 +89,23 @@ const ListaPedidos = () => {
     let selectedId = [];
     for (let i = 0; i < selectedRecords.length; i++) {
       selectedOrder.push(
-        selectedRecords[i].codigo + "-" + selectedRecords[i].nombre
+        selectedRecords[i].nombre_retiro
       );
       selectedId.push(selectedRecords[i]._id);
     }
+    console.log(selectedId);
     return (
       <div className="px-4 py-2">
-        <p>Seguro de eliminar el producto:</p>
-        {selectedOrder?.map((producto, index) => (
+        <p>Seguro de eliminar el pedido a nombre de:</p>
+        {selectedOrder?.map((pedido, index) => (
           <div key={index}>
-            <p className="text-red-400">{producto}</p>
+            <p className="text-red-400">{pedido}</p>
           </div>
         ))}
         <span className="mt-2 flex gap-2">
           <button
             className="bg-red-400 rounded-lg text-white text-sm px-3 py-1"
-            onClick={() => productoDelete(selectedId)}
+            onClick={() => deletePedido(selectedId)}
           >
             Si
           </button>
@@ -253,11 +255,10 @@ const ListaPedidos = () => {
     },
   ];
   const searchChange = (e) => {
-    const filteredRecords = pedidos.filter((record) => {
-      return record.nombre.toLowerCase().includes(e.target.value.toLowerCase());
+    const filteredRecords = allPedidos.filter((record) => {
+      return record.nombre_retiro.toLowerCase().includes(e.target.value.toLowerCase());
     });
-    setRecords(filteredRecords);
-    //console.log(records);
+    setAllRecords(filteredRecords);
   };
   const updateEstadoPedido = (id, data) => {
     putEstadoPedido(id, data);
@@ -383,7 +384,7 @@ const ListaPedidos = () => {
                 <input
                   className="appearance-none block w-full bg-amber-50 text-gray-700
                   rounded leading-tight focus:outline-none py-2 focus:bg-white px-2"
-                  placeholder="Buscar productos"
+                  placeholder="Nombre de retiro"
                   type="text"
                   id="search"
                   onChange={searchChange}
